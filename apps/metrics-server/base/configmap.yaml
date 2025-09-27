@@ -1,0 +1,24 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: metrics-server
+  namespace: kube-system
+data:
+  config.json: |
+    {
+      "prometheus": {
+        "applications": [
+          {
+            "name": "default",
+            "default": true,
+            "dashboards": []
+          }
+        ],
+        "providers": {
+          "Name": "default",
+          "default": true,
+          "address": http://prometheus.kube-system.svc.cluster.local:9090,
+        }
+      }
+    }
