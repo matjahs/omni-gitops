@@ -1,0 +1,5 @@
+---
+cluster:
+  network:
+    proxy:
+      disabled: true

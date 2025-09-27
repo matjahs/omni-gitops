@@ -1,0 +1,18 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: argocd
+
+resources:
+- foo.yaml
+- argocd.yaml
+- metrics-server.yaml
+
+
+commonAnnotations:
+  argocd.argoproj.io/sync-wave: "0"
+labels:
+- includeSelectors: true
+  pairs:
+    app.kubernetes.io/managed-by: argocd
+    app.kubernetes.io/part-of: platform

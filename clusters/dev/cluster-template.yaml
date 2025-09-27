@@ -1,0 +1,126 @@
+kind: Cluster
+name: cluster1
+kubernetes:
+  version: v1.34.1
+talos:
+  version: v1.11.1
+features:
+  useEmbeddedDiscoveryService: true
+  backupConfiguration:
+    interval: 1h0m0s
+patches:
+  - idOverride: 200-cluster1
+    inline:
+      cluster:
+        network:
+          cni:
+            name: none
+        proxy:
+          disabled: false
+  - file: patches/10-kubespan.yaml
+  - file: patches/30-no-default-cni.yaml
+  - file: patches/31-no-default-proxy.yaml
+  - file: patches/50-loadbalancer-exclusion.yaml
+  - file: patches/60-cilium.yaml
+---
+kind: ControlPlane
+machines:
+  - 0ced0642-b894-7686-7c54-31f0411a9c9f
+  - 5f360642-2381-48f2-9264-52ea0c39d12a
+  - add90642-14d4-bb34-de7a-cfda262fef47
+patches:
+  - idOverride: 400-cluster1-control-planes
+    inline:
+      cluster:
+        allowSchedulingOnControlPlanes: true
+      machine:
+        network:
+          interfaces:
+            - deviceSelector:
+                physical: true
+              dhcp: false
+              vip:
+                ip: 172.16.20.250
+---
+kind: Workers
+---
+kind: Machine
+systemExtensions:
+  - siderolabs/iscsi-tools
+  - siderolabs/mdadm
+  - siderolabs/util-linux-tools
+  - siderolabs/vmtoolsd-guest-agent
+name: 0ced0642-b894-7686-7c54-31f0411a9c9f
+patches:
+  - idOverride: 400-cm-0ced0642-b894-7686-7c54-31f0411a9c9f
+    inline:
+      machine:
+        install:
+          disk: /dev/sda
+        network:
+          extraHostEntries:
+            - aliases:
+                - node01
+              ip: 172.16.20.51
+            - aliases:
+                - node02
+              ip: 172.16.20.52
+            - aliases:
+                - node03
+              ip: 172.16.20.53
+          hostname: node03
+          interfaces:
+            - addresses:
+                - 172.16.20.53/24
+              deviceSelector:
+                physical: true
+              dhcp: false
+              routes:
+                - gateway: 172.16.20.1
+                  network: 0.0.0.0/0
+          nameservers:
+            - 172.16.0.53
+          searchDomains:
+            - lab.mxe11.nl
+            - corp.mxe11.nl
+            - mxe11.nl
+---
+kind: Machine
+name: 5f360642-2381-48f2-9264-52ea0c39d12a
+patches:
+  - idOverride: 400-cm-5f360642-2381-48f2-9264-52ea0c39d12a
+    inline:
+      machine:
+        install:
+          disk: /dev/sda
+        network:
+          hostname: node01
+          interfaces:
+            - addresses:
+                - 172.16.20.51/24
+              deviceSelector:
+                physical: true
+              dhcp: false
+              routes:
+                - gateway: 172.16.20.1
+                  network: 0.0.0.0/0
+---
+kind: Machine
+name: add90642-14d4-bb34-de7a-cfda262fef47
+patches:
+  - idOverride: 400-cm-add90642-14d4-bb34-de7a-cfda262fef47
+    inline:
+      machine:
+        install:
+          disk: /dev/sda
+        network:
+          hostname: node02
+          interfaces:
+            - addresses:
+                - 172.16.20.52/24
+              deviceSelector:
+                physical: true
+              dhcp: false
+              routes:
+                - gateway: 172.16.20.1
+                  network: 0.0.0.0/0

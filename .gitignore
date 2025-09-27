@@ -1,0 +1,31 @@
+.vscode/
+.idea/
+.claude/
+rolling-reboot.sh
+
+config/
+terraform/
+
+.DS_Store
+*.log
+*.tfstate
+*.tfstate.backup
+.terraform/
+.terraform.lock.hcl
+*.tfvars
+*.tfvars.json
+crds/
+*.backup
+*.swp
+
+# Local env files
+.env
+.env.local
+.env.*.local
+
+# MacOS files
+.AppleDouble
+.LSOverride
+
+# Thumbnails
+._*
