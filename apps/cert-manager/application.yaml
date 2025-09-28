@@ -1,25 +1,22 @@
----
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: cert-manager
   namespace: argocd
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
-  source:
-    repoURL: https://github.com/matjahs/omni-gitops  # Update with your repo
-    targetRevision: HEAD
-    path: apps/cert-manager/overlays/production
   destination:
-    server: https://kubernetes.svc.local
     namespace: kube-system
+    server: https://kubernetes.svc.local
+  source:
+    chart: cert-manager
+    helm:
+      parameters:
+        - name: installCRDs
+          value: "true"
+    repoURL: https://charts.jetstack.io
+    targetRevision: v1.11.0
   syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
+    automated: {}
     syncOptions:
       - CreateNamespace=false
-      - PrunePropagationPolicy=foreground
-      - RespectIgnoreDifferences=true
