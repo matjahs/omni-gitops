@@ -1,6 +1,0 @@
----
-argo-cd:
-  dex:
-    enabled: true
-  global:
-    priorityClassName: system-cluster-critical
