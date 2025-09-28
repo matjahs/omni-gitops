@@ -7,3 +7,4 @@ metadata:
     name: traefik-system
     app.kubernetes.io/name: traefik
     app.kubernetes.io/component: ingress-controller
+    app.kubernetes.io/part-of: traefik

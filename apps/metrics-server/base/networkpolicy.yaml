@@ -6,4 +6,54 @@ metadata:
 spec:
   podSelector:
     matchLabels:
-      
+      k8s-app: metrics-server
+  policyTypes:
+    - Ingress
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: TCP
+          port: 4443  # Metrics Server port
+        - protocol: TCP
+          port: 10250 # Kubelet port
+        - protocol: TCP
+          port: 10255 # Kubelet read-only port
+        - protocol: TCP
+          port: 443   # Kube API server port
+        - protocol: TCP
+          port: 80    # HTTP port for health checks
+        - protocol: TCP
+          port: 443   # HTTPS port for health checks
+    - from:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 4443  # Metrics Server port
+        - protocol: TCP
+          port: 10250 # Kubelet port
+        - protocol: TCP
+          port: 10255 # Kubelet read-only port
+        - protocol: TCP
+          port: 443   # Kube API server port
+        - protocol: TCP
+          port: 80    # HTTP port for health checks
+        - protocol: TCP
+          port: 443   # HTTPS port for health checks
+  egress:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kube-system
+      ports:
+        - protocol: TCP
+          port: 443   # Kube API server port
+    - to:
+        - podSelector: {}
+      ports:
+        - protocol: TCP
+          port: 443   # Kube API server port
+          
+

@@ -4,6 +4,8 @@ kind: Application
 metadata:
   name: traefik
   namespace: argocd
+  labels:
+    app.kubernetes.io/part-of: traefik
 spec:
   destination:
     namespace: traefik-system

@@ -2,30 +2,24 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: traefik
+  name: cert-manager
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
 spec:
   project: default
   source:
-    repoURL: https://github.com/matjahs/omni-gitops
+    repoURL: https://github.com/matjahs/omni-gitops  # Update with your repo
     targetRevision: HEAD
-    path: apps/traefik/overlays/production
+    path: apps/cert-manager/overlays/production
   destination:
-    server: https://kubernetes.default.svc
-    namespace: traefik-system
+    server: https://kubernetes.svc.local
+    namespace: kube-system
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
-      - CreateNamespace=true
+      - CreateNamespace=false
       - PrunePropagationPolicy=foreground
       - RespectIgnoreDifferences=true
-    retry:
-      limit: 3
-      backoff:
-        duration: 5s
-        factor: 2
-        maxDuration: 3m

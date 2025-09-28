@@ -23,7 +23,7 @@ providers:
     publishedService:
       enabled: true
   kubernetesCRD:
-    enabeled: true
+    enabled: true
 
 certificatesResolvers:
   letsencrypt:

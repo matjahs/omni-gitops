@@ -21,7 +21,7 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-      - PrunePropogationPolicy=foreground
+      - PrunePropagationPolicy=foreground
       - RespectIgnoreDifferences=true
     retry:
       limit: 3
