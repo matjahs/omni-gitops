@@ -3,7 +3,7 @@ kind: Certificate
 metadata:
   name: argo-cd-cert
 spec:
-  secretName: argocd-secret
+  secretName: argocd-tls-cert
   issuerRef:
     name: argo-cd-issuer
     kind: Issuer

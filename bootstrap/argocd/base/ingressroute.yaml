@@ -5,7 +5,7 @@ metadata:
   namespace: argocd
 spec:
   entryPoints:
-    - web
+    - websecure
   routes:
     - kind: Rule
       match: Host(`cd.apps.lab.mxe11.nl`)
@@ -18,3 +18,5 @@ spec:
           name: argocd-server
           port: 80
           scheme: http
+  tls:
+    secretName: argocd-tls-cert

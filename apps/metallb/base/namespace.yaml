@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: metallb-system-privileged
+  name: metallb-system
   labels:
     app.kubernetes.io/name: metallb
     app.kubernetes.io/part-of: metallb

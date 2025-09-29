@@ -72,7 +72,7 @@ kubectl get applications -n argocd
 
 # Check platform services
 kubectl get pods -n traefik-system
-kubectl get pods -n metallb-system-privileged
+kubectl get pods -n metallb-system
 kubectl get pods -n kube-system -l app.kubernetes.io/name=metrics-server
 ```
 
@@ -138,7 +138,7 @@ ArgoCD will automatically deploy:
    - Dashboard: https://traefik.apps.lab.mxe11.nl/dashboard
 
 3. **MetalLB** (load balancer)
-   - Location: `metallb-system-privileged` namespace
+   - Location: `metallb-system` namespace
    - IP Pool: 172.16.20.100-150
 
 4. **Metrics Server** (HPA support)
@@ -215,7 +215,7 @@ kubectl patch application traefik -n argocd \
 kubectl get pods -n kube-system -l k8s-app=cilium
 
 # Check MetalLB
-kubectl get pods -n metallb-system-privileged
+kubectl get pods -n metallb-system
 
 # Check LoadBalancer services
 kubectl get svc --all-namespaces -o wide
