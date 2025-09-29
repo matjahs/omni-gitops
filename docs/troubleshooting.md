@@ -233,25 +233,25 @@ kubectl get ingressclass
 **Diagnosis:**
 ```bash
 # Check MetalLB pods
-kubectl get pods -n metallb-system
+kubectl get pods -n metallb-system-privileged
 
 # Check IP address pools
-kubectl get ipaddresspool -n metallb-system
+kubectl get ipaddresspool -n metallb-system-privileged
 
 # Check L2 advertisements
-kubectl get l2advertisement -n metallb-system
+kubectl get l2advertisement -n metallb-system-privileged
 
 # Check MetalLB logs
-kubectl logs -n metallb-system -l app=metallb
+kubectl logs -n metallb-system-privileged -l app=metallb
 ```
 
 **Solutions:**
 ```bash
 # Restart MetalLB controller
-kubectl rollout restart deployment/controller -n metallb-system
+kubectl rollout restart deployment/controller -n metallb-system-privileged
 
 # Check IP pool configuration
-kubectl describe ipaddresspool default-pool -n metallb-system
+kubectl describe ipaddresspool default-pool -n metallb-system-privileged
 
 # Verify network connectivity
 ping 172.16.20.100  # Test an IP from the pool
@@ -271,19 +271,19 @@ nmap -sn 172.16.20.0/24
 arp -a | grep 172.16.20
 
 # Check MetalLB speaker logs
-kubectl logs -n metallb-system -l component=speaker
+kubectl logs -n metallb-system-privileged -l component=speaker
 ```
 
 **Solutions:**
 ```bash
 # Update IP pool to avoid conflicts
-kubectl edit ipaddresspool default-pool -n metallb-system
+kubectl edit ipaddresspool default-pool -n metallb-system-privileged
 
 # Clear ARP cache
 sudo ip neigh flush all
 
 # Restart network components
-kubectl rollout restart daemonset/speaker -n metallb-system
+kubectl rollout restart daemonset/speaker -n metallb-system-privileged
 ```
 
 ### Metrics Server Issues

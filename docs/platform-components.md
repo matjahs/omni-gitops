@@ -115,7 +115,7 @@ kubectl get ingress --all-namespaces
 ## MetalLB (Load Balancer)
 
 **Purpose:** Bare metal load balancing for Kubernetes services
-**Namespace:** `metallb-system`
+**Namespace:** `metallb-system-privileged`
 **Repository:** Helm chart from https://metallb.github.io/metallb
 
 ### Features
@@ -164,14 +164,14 @@ spec:
 ### Monitoring
 ```bash
 # Check MetalLB controller
-kubectl get pods -n metallb-system
+kubectl get pods -n metallb-system-privileged
 
 # View IP assignments
 kubectl get svc --all-namespaces -o wide | grep LoadBalancer
 
 # Check MetalLB configuration
-kubectl get ipaddresspool -n metallb-system
-kubectl get l2advertisement -n metallb-system
+kubectl get ipaddresspool -n metallb-system-privileged
+kubectl get l2advertisement -n metallb-system-privileged
 ```
 
 ## Metrics Server (Resource Metrics)
