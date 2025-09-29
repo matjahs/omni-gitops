@@ -1,4 +1,4 @@
----
+# platform/traefik.yaml
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -12,7 +12,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/matjahs/omni-gitops.git
+    repoURL: https://github.com/matjahs/omni-gitops
     targetRevision: HEAD
     path: apps/traefik/overlays/production
   destination:
@@ -26,9 +26,3 @@ spec:
       - CreateNamespace=true
       - PrunePropagationPolicy=foreground
       - RespectIgnoreDifferences=true
-    retry:
-      limit: 3
-      backoff:
-        duration: 5s
-        factor: 2
-        maxDuration: 3m
