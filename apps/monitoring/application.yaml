@@ -1,0 +1,99 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kube-prometheus-stack
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  sources:
+    - repoURL: https://prometheus-community.github.io/helm-charts
+      chart: kube-prometheus-stack
+      targetRevision: "67.6.1"
+      helm:
+        values: |
+          # Prometheus Configuration
+          prometheus:
+            prometheusSpec:
+              retention: 30d
+              storageSpec:
+                volumeClaimTemplate:
+                  spec:
+                    accessModes: ["ReadWriteOnce"]
+                    resources:
+                      requests:
+                        storage: 50Gi
+              additionalScrapeConfigs:
+                - job_name: traefik
+                  kubernetes_sd_configs:
+                    - role: pod
+                      namespaces:
+                        names:
+                          - traefik-system
+                  relabel_configs:
+                    - source_labels: [__meta_kubernetes_pod_name]
+                      action: keep
+                      regex: traefik-.*
+
+            ingress:
+              enabled: false
+
+          # Grafana Configuration
+          grafana:
+            adminPassword: changeme
+            ingress:
+              enabled: false
+
+            persistence:
+              enabled: true
+              size: 10Gi
+
+            sidecar:
+              dashboards:
+                enabled: true
+                defaultFolderName: "Kubernetes"
+              datasources:
+                enabled: true
+
+          # Alertmanager Configuration
+          alertmanager:
+            alertmanagerSpec:
+              storage:
+                volumeClaimTemplate:
+                  spec:
+                    accessModes: ["ReadWriteOnce"]
+                    resources:
+                      requests:
+                        storage: 10Gi
+
+          # Enable all exporters
+          nodeExporter:
+            enabled: true
+
+          kubeStateMetrics:
+            enabled: true
+
+    - repoURL: https://github.com/matjahs/omni-gitops.git
+      targetRevision: HEAD
+      path: apps/monitoring
+      directory:
+        recurse: false
+        include: '{grafana,prometheus}-{certificate,ingressroute}.yaml'
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true
+    retry:
+      limit: 3
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

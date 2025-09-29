@@ -9,6 +9,7 @@ resources:
 - traefik.yaml
 - metallb.yaml
 - cert-manager.yaml
+- monitoring.yaml
 # - hubble-ui.yaml
 
 commonAnnotations:
