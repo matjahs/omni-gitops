@@ -1,13 +1,13 @@
+# bootstrap/argocd/kustomization.yaml
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 namespace: argocd
 
 resources:
-- base/argo-cd-certificate.yaml
 - base/argo-cd-issuer.yaml
+- base/argo-cd-certificate.yaml
 - base/argo-cd-ui-ingress.yaml
-- base/ingressroute.yaml
 - base/rollouts-extension.yaml
 - base/sync-project.yaml
 - https://raw.githubusercontent.com/argoproj/argo-cd/master/manifests/ha/install.yaml
@@ -17,12 +17,25 @@ components:
 
 patches:
 - path: overlays/production/argo-cd-cm.yaml
+  target:
+    kind: ConfigMap
+    name: argocd-cm
 - path: overlays/production/argocd-cmd-params-cm.yaml
+  target:
+    kind: ConfigMap
+    name: argocd-cmd-params-cm
 - path: overlays/production/argocd-notifications-cm.yaml
-- path: overlays/production/argocd-notifications-controller-deploy.yaml
+  target:
+    kind: ConfigMap
+    name: argocd-notifications-cm
 - path: overlays/production/argocd-rbac-cm.yaml
+  target:
+    kind: ConfigMap
+    name: argocd-rbac-cm
 - path: overlays/production/argocd-server-service.yaml
-- path: https://raw.githubusercontent.com/argoproj/argo-cd/master/notifications_catalog/install.yaml
+  target:
+    kind: Service
+    name: argocd-server
 # - path: overlays/production/patch-priority-class.yaml
 #   target:
 #     kind: Deployment
