@@ -2,7 +2,8 @@
 
 - [ ] deploy HashiCorp Vault integration (http://vault.mxe11.nl:8200)
 - [ ] maybe consul?
-- [ ] ACME
+- [x] ACME (cert-manager with Cloudflare DNS-01)
+- [ ] Wildcard certificate for *.apps.lab.mxe11.nl
 - [ ] integrate with ADCS/Vault for PKI
 - [ ] RBAC
 - [ ] customer namespace
