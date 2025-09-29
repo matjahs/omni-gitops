@@ -1,4 +1,4 @@
----
+# platform/argocd.yaml
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -6,15 +6,12 @@ metadata:
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
-  labels:
-    app.kubernetes.io/managed-by: argocd
-    app.kubernetes.io/part-of: platform
 spec:
   project: default
   source:
-    repoURL: https://github.com/matjahs/omni-gitops.git
+    repoURL: https://github.com/matjahs/omni-gitops
     targetRevision: HEAD
-    path: apps/argocd/overlays/production
+    path: bootstrap/argocd
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
@@ -24,11 +21,5 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-      - PrunePropagationPolicy=Foreground
+      - PrunePropagationPolicy=foreground
       - RespectIgnoreDifferences=true
-    retry:
-      limit: 3
-      backoff:
-        duration: 5s
-        factor: 2
-        maxDuration: 3m
