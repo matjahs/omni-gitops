@@ -1,6 +1,6 @@
 # omni-ops
 
-
+[![Build Status](https://cd.apps.lab.mxe11.nl/api/badge?name=argocd&revision=true&showAppName=true)]
 
 
 ## ArgoCD GitOps Structure
