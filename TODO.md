@@ -6,17 +6,18 @@
 - [ ] Wildcard certificate for *.apps.lab.mxe11.nl
 - [ ] integrate with ADCS/Vault for PKI
 - [ ] RBAC
-- [ ] customer namespace
-- [ ]
+- [ ] customer namespace (vCluster + ?)
+- [x] Monitoring stack (Prometheus + Grafana)
+- [ ] Create ingress for Longhorn dashboard
+- [ ] Uptime Kuma
 
 ## ArgoCD Apps
 
-- [ ] cert-manager
+- [x] cert-manager
 - [ ] hubble-ui
-- [ ] metallb
-- [ ] metrics-server
+- [x] metallb
+- [x] metrics-server
 - [ ] shared
-- [ ] traefik
+- [x] traefik
 - [ ] vault
-- [ ] grafana
-- [ ] prometheus
+- [x] monitoring (kube-prometheus-stack)

@@ -6,9 +6,9 @@ namespace: argocd
 
 resources:
 - base/cloudflare-api-token-secret.yaml
-- base/argo-cd-issuer.yaml
+- base/argocd-issuer.yaml
 - base/cloudflare-clusterissuer.yaml
-- base/argo-cd-certificate.yaml
+- base/argocd-certificate.yaml
 - base/ingressroute.yaml
 - base/rollouts-extension.yaml
 - base/sync-project.yaml
@@ -48,5 +48,5 @@ patches:
 
 images:
 - name: quay.io/argoproj/argocd
-  newName: ghcr.io/argoproj/argo-cd/argocd
+  newName: ghcr.io/argoproj/argocd/argocd
   newTag: 3.3.0-31088be6
