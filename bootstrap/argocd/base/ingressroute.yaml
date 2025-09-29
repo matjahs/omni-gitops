@@ -8,8 +8,11 @@ spec:
     - web
     - websecure
   routes:
-  - match: Host(`cd.apps.lab.mxe11.nl`)
-    kind: Rule
-    services:
-    - name: argocd-server
-      port: 80
+    - kind: Rule
+      match: Host(`cd.apps.lab.mxe11.nl`)
+      services:
+        - kind: Service
+          name: argocd-server
+          namespace: argocd
+          port: 80
+          scheme: http

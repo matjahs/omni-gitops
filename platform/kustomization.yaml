@@ -9,7 +9,7 @@ resources:
 - traefik.yaml
 - metallb.yaml
 - cert-manager.yaml
-- hubble-ui.yaml
+# - hubble-ui.yaml
 
 commonAnnotations:
   argocd.argoproj.io/sync-wave: "0"
