@@ -16,11 +16,11 @@ data:
         args: ["argocd-flux-plugin . --path $GIT_PATH"]
   dex.config: |
     connectors:
-    - type: github
-      id: github
-      name: GitHub
-      config:
-        clientID: $argocd-oidc-secret:clientID
-        clientSecret: $argocd-oidc-secret:clientSecret
-        orgs:
+      - type: github
+        id: github
+        name: GitHub
+        config:
+          clientID: $argocd-oidc-secret:clientID
+          clientSecret: $argocd-oidc-secret:clientSecret
+          orgs:
           - name: matjahs

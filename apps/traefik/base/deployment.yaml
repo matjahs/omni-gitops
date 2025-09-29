@@ -77,4 +77,4 @@ spec:
           name: traefik-config
       - name: data
         emptyDir: {}
-      priorityClassName: system-cluster-critical
+      # priorityClassName: system-cluster-critical
