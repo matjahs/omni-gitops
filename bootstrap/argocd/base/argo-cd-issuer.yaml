@@ -2,6 +2,7 @@ apiVersion: cert-manager.io/v1
 kind: Issuer
 metadata:
   name: argo-cd-issuer
+  namespace: argocd
 spec:
   acme:
     server: https://acme-v02.api.letsencrypt.org/directory
@@ -9,8 +10,8 @@ spec:
     privateKeySecretRef:
       name: letsencrypt
     solvers:
-      # An empty 'selector' means that this solver matches all domains
-      - selector: {}
-        http01:
-          ingress:
-            class: traefik
+      - dns01:
+          cloudflare:
+            apiTokenSecretRef:
+              name: cloudflare-api-token
+              key: api-token

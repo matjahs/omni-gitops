@@ -10,4 +10,3 @@ spec:
   commonName: cd.apps.lab.mxe11.nl
   dnsNames:
     - cd.apps.lab.mxe11.nl
-    - www.cd.apps.lab.mxe11.nl

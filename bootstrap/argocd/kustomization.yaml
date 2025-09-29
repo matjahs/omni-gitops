@@ -5,6 +5,7 @@ kind: Kustomization
 namespace: argocd
 
 resources:
+- base/cloudflare-api-token-secret.yaml
 - base/argo-cd-issuer.yaml
 - base/argo-cd-certificate.yaml
 - base/ingressroute.yaml
