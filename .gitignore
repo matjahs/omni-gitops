@@ -34,3 +34,6 @@ splunk/deployment-apps/forwarder_outputs/default/outputs.conf
 splunk/deployment-apps/forwarder_outputs/metadata/local.meta
 .idea/
 .dockerconfigjson
+
+# Secrets - do not commit
+apps/base/external-secrets/vault-token-secret.yaml

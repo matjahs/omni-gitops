@@ -5,7 +5,6 @@ kind: Kustomization
 namespace: argocd
 
 resources:
-- base/cloudflare-api-token-secret.yaml
 - base/rollouts-extension.yaml
 - base/sync-project.yaml
 - https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/ha/install.yaml

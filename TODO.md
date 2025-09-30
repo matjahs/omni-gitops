@@ -22,3 +22,25 @@
 - [ ] vault
 - [x] monitoring (kube-prometheus-stack)
 - [x] persistent storage (Rook Ceph)
+
+## Priority 2: Force Delete Stuck Namespace
+
+- [ ] ```kubectl get namespace longhorn-system -o json --context=matjahs-cluster1-matjah@matjah.nl | \
+  jq '.spec.finalizers = []' | \
+  kubectl replace --raw "/api/v1/namespaces/longhorn-system/finalize" -f - --context=matjahs-cluster1-matjah@matjah.nl```
+
+## Prority 3: Align Applications with repo
+
+- [ ] metallb - Currently points to https://metallb.github.io/metallb
+- [ ] traefik - Currently points to https://traefik.github.io/charts
+- [ ] rook-ceph-* - Currently points to https://charts.rook.io/release
+- [ ] Replace them with your applications/*.yaml files.
+
+
+## Priority 4: Add Missing Applications
+
+From your repo but not deployed:
+
+- [ ] external-secrets
+- [ ] external-secrets-config
+- [ ] hubble-ui

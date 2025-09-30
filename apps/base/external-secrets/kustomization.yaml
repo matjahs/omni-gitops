@@ -1,0 +1,9 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+- cluster-secret-store.yaml
+- cloudflare-external-secret.yaml
+- cloudflare-external-secret-certmanager.yaml
+
+# Note: vault-token-secret.yaml must be created manually (see README.md)
