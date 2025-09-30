@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: hubble-ui-tls
+  namespace: kube-system
+spec:
+  secretName: hubble-ui-tls
+  issuerRef:
+    name: cloudflare-dns-issuer
+    kind: ClusterIssuer
+  commonName: hubble.apps.lab.mxe11.nl
+  dnsNames:
+    - hubble.apps.lab.mxe11.nl
