@@ -38,7 +38,6 @@ patches:
   target:
     kind: Service
     name: argocd-server
-- path: overlays
 # - path: overlays/production/patch-priority-class.yaml
 #   target:
 #     kind: Deployment
