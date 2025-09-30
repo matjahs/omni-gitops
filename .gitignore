@@ -33,3 +33,4 @@ splunk/deployment-apps/forwarder_outputs/default/app.conf
 splunk/deployment-apps/forwarder_outputs/default/outputs.conf
 splunk/deployment-apps/forwarder_outputs/metadata/local.meta
 .idea/
+.dockerconfigjson
