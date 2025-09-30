@@ -18,7 +18,7 @@ components:
 - https://github.com/argoproj-labs/argocd-extensions/manifests
 
 patches:
-- path: overlays/production/argo-cd-cm.yaml
+- path: overlays/production/argocd-cm.yaml
   target:
     kind: ConfigMap
     name: argocd-cm
