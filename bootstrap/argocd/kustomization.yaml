@@ -6,9 +6,9 @@ namespace: argocd
 
 resources:
 - base/cloudflare-api-token-secret.yaml
-- base/argocd-issuer.yaml
+- base/argo-cd-issuer.yaml
 - base/cloudflare-clusterissuer.yaml
-- base/argocd-certificate.yaml
+- base/argo-cd-certificate.yaml
 - base/ingressroute.yaml
 - base/rollouts-extension.yaml
 - base/sync-project.yaml
