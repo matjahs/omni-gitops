@@ -115,6 +115,9 @@ spec:
                 csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
                 csi.storage.k8s.io/fstype: ext4
 
+        # Disable CephObjectStore (using Minio instead)
+        cephObjectStores: []
+
   destination:
     server: https://kubernetes.default.svc
     namespace: rook-ceph
