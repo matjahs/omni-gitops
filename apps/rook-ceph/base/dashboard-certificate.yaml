@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: ceph-dashboard-tls
+  namespace: rook-ceph
+spec:
+  secretName: ceph-dashboard-tls
+  issuerRef:
+    name: cloudflare-dns-issuer
+    kind: ClusterIssuer
+  commonName: ceph.apps.lab.mxe11.nl
+  dnsNames:
+    - ceph.apps.lab.mxe11.nl
