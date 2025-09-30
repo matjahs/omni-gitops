@@ -1,0 +1,51 @@
+# Uptime Kuma Helm Values
+
+# Image configuration
+image:
+  registry: docker.io
+  repository: louislam/uptime-kuma
+  tag: 1  # Use latest stable
+  pullPolicy: IfNotPresent
+
+# Persistence
+persistence:
+  enabled: true
+  storageClass: ""  # Use default storage class (rook-ceph)
+  accessMode: ReadWriteOnce
+  size: 4Gi
+
+# Service configuration
+service:
+  type: ClusterIP
+  port: 3001
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: traefik
+  annotations:
+    cert-manager.io/cluster-issuer: cloudflare-dns-issuer
+  hosts:
+    - host: uptime.apps.lab.mxe11.nl
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: uptime-kuma-tls
+      hosts:
+        - uptime.apps.lab.mxe11.nl
+
+# Resources
+resources:
+  limits:
+    cpu: 500m
+    memory: 512Mi
+  requests:
+    cpu: 100m
+    memory: 128Mi
+
+# Security context
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  fsGroup: 1000
