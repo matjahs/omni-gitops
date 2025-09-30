@@ -171,9 +171,7 @@ Reserve IP range for MetalLB:
 ### DNS Configuration
 ```bash
 # Example DNS records
-cd.apps.lab.mxe11.nl.     IN  A  172.16.20.100
-traefik.apps.lab.mxe11.nl. IN  A  172.16.20.101
-*.apps.lab.mxe11.nl.      IN  A  172.16.20.102
+*.apps.lab.mxe11.nl.      IN  A  172.16.20.100
 ```
 
 ### Omni Preparation
