@@ -1,6 +1,6 @@
 # TODO
 
-- [ ] deploy HashiCorp Vault integration (http://vault.mxe11.nl:8200)
+- [x] deploy HashiCorp Vault integration (http://vault.mxe11.nl:8200)
 - [ ] maybe consul?
 - [x] ACME (cert-manager with Cloudflare DNS-01)
 - [ ] Wildcard certificate for *.apps.lab.mxe11.nl
@@ -25,9 +25,7 @@
 
 ## Priority 2: Force Delete Stuck Namespace
 
-- [ ] ```kubectl get namespace longhorn-system -o json --context=matjahs-cluster1-matjah@matjah.nl | \
-  jq '.spec.finalizers = []' | \
-  kubectl replace --raw "/api/v1/namespaces/longhorn-system/finalize" -f - --context=matjahs-cluster1-matjah@matjah.nl```
+- [x] longhorn-system namespace successfully deleted
 
 ## Prority 3: Align Applications with repo
 
@@ -41,6 +39,12 @@
 
 From your repo but not deployed:
 
-- [ ] external-secrets
-- [ ] external-secrets-config
+- [x] external-secrets
+- [x] external-secrets-config
 - [ ] hubble-ui
+
+## Wishlist
+
+- [ ] `external-dns` -> technitium server on `172.16.0.53`
+- [ ] 1password integration
+- [ ] keycloak integration

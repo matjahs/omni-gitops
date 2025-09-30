@@ -17,7 +17,7 @@ spec:
     targetRevision: "0.15.2"
     helm:
       valueFiles:
-      - $values/apps/overlays/production/metallb/values.yaml
+      - $values/apps/metallb-system/overlays/production/values.yaml
   - repoURL: https://github.com/matjahs/omni-gitops.git
     targetRevision: HEAD
     ref: values

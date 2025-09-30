@@ -8,10 +8,10 @@ resources:
 - base/rollouts-extension.yaml
 - base/sync-project.yaml
 - https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/ha/install.yaml
-- ../../apps/overlays/production/argocd/argo-cd-issuer.yaml
-- ../../apps/overlays/production/argocd/argo-cd-certificate.yaml
-- ../../apps/overlays/production/argocd/ingressroute.yaml
-- ../../apps/base/cert-manager/cloudflare-clusterissuer.yaml
+- ../../apps/argocd/overlays/production/argo-cd-issuer.yaml
+- ../../apps/argocd/overlays/production/argo-cd-certificate.yaml
+- ../../apps/argocd/overlays/production/ingressroute.yaml
+- ../../apps/cert-manager/base/cloudflare-clusterissuer.yaml
 
 components:
 - https://github.com/argoproj-labs/argocd-extensions/manifests
