@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wildcard-apps-lab-mxe11-nl
+  namespace: cert-manager
+spec:
+  secretName: wildcard-apps-lab-mxe11-nl-tls
+  issuerRef:
+    name: cloudflare-dns-issuer
+    kind: ClusterIssuer
+  commonName: "*.apps.lab.mxe11.nl"
+  dnsNames:
+    - "*.apps.lab.mxe11.nl"
+    - "apps.lab.mxe11.nl"
