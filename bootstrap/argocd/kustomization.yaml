@@ -12,7 +12,7 @@ resources:
 - base/ingressroute.yaml
 - base/rollouts-extension.yaml
 - base/sync-project.yaml
-- https://raw.githubusercontent.com/argoproj/argo-cd/master/manifests/ha/install.yaml
+- https://raw.githubusercontent.com/argoproj/argo-cd/v2.13.3/manifests/ha/install.yaml
 
 components:
 - https://github.com/argoproj-labs/argocd-extensions/manifests
