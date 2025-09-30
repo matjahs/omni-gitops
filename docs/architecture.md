@@ -64,7 +64,7 @@ This platform follows cloud-native principles with immutable infrastructure and 
 - Automatic drift detection and remediation
 
 **Repository Structure:**
-- `appplications/` - Core infrastructure components
+- `applications/` - Core infrastructure components
 - `apps/` - Application definitions with base/overlay pattern
 - `clusters/` - Cluster bootstrapping and environment overlays (e.g. `cluster1`)
 

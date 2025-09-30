@@ -109,8 +109,8 @@ preflight_checks() {
     exit 1
   fi
 
-  if [[ ! -f "appplications/kustomization.yaml" ]]; then
-    log "appplications/kustomization.yaml not found. Are you in the repository root?" error
+  if [[ ! -f "applications/kustomization.yaml" ]]; then
+    log "applications/kustomization.yaml not found. Are you in the repository root?" error
     exit 1
   fi
 
@@ -158,7 +158,7 @@ install_argocd() {
 # Deploy platform applications
 deploy_platform() {
   log "Deploying platform applications..."
-  kubectl apply -k appplications/
+  kubectl apply -k applications/
 
   log "Waiting for applications to be created..."
   sleep 5

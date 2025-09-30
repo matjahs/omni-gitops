@@ -495,7 +495,7 @@ argocd app sync --all
 kubectl delete application <app-name> -n argocd
 
 # 2. Recreate from platform manifests
-kubectl apply -f appplications/<app-name>.yaml
+kubectl apply -f applications/<app-name>.yaml
 
 # 3. Wait for sync
 argocd app wait <app-name>

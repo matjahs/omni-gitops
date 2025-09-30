@@ -6,13 +6,13 @@ namespace: argocd
 
 resources:
 - base/cloudflare-api-token-secret.yaml
-- base/argo-cd-issuer.yaml
-- base/cloudflare-clusterissuer.yaml
-- base/argo-cd-certificate.yaml
-- base/ingressroute.yaml
 - base/rollouts-extension.yaml
 - base/sync-project.yaml
 - https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/ha/install.yaml
+- ../../apps/overlays/production/argocd/argo-cd-issuer.yaml
+- ../../apps/overlays/production/argocd/argo-cd-certificate.yaml
+- ../../apps/overlays/production/argocd/ingressroute.yaml
+- ../../apps/base/cert-manager/cloudflare-clusterissuer.yaml
 
 components:
 - https://github.com/argoproj-labs/argocd-extensions/manifests

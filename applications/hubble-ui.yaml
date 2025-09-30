@@ -1,8 +1,8 @@
-# appplications/argocd.yaml
+---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: argocd
+  name: hubble-ui
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -12,17 +12,23 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/matjahs/omni-gitops
+    repoURL: https://github.com/matjahs/omni-gitops.git
     targetRevision: HEAD
-    path: clusters/cluster1
+    path: apps/overlays/production/hubble-ui
   destination:
     server: https://kubernetes.default.svc
-    namespace: argocd
+    namespace: kube-system
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
-      - CreateNamespace=true
+      - CreateNamespace=false
       - PrunePropagationPolicy=foreground
       - RespectIgnoreDifferences=true
+    retry:
+      limit: 3
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m

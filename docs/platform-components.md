@@ -2,13 +2,13 @@
 
 ## Overview
 
-The platform consists of four core components managed by ArgoCD in a GitOps pattern. Each component is defined in the `appplications/` directory and automatically deployed and maintained.
+The platform consists of four core components managed by ArgoCD in a GitOps pattern. Each component is defined in the `applications/` directory and automatically deployed and maintained.
 
 ## ArgoCD (GitOps Engine)
 
 **Purpose:** Continuous delivery and configuration management
 **Namespace:** `argocd`
-**Repository:** Self-managed via `appplications/argocd.yaml`
+**Repository:** Self-managed via `applications/argocd.yaml`
 
 ### Features
 - **Self-Managing:** ArgoCD manages its own configuration
@@ -40,7 +40,7 @@ syncPolicy:
 ### Key Files
 - `clusters/cluster1/kustomization.yaml` - Base installation
 - `clusters/cluster1/overlays/production/` - Production overrides
-- `appplications/argocd.yaml` - Self-management application
+- `applications/argocd.yaml` - Self-management application
 
 ### Monitoring
 ```bash

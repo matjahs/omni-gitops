@@ -44,7 +44,7 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.pas
 
 ```
 ├── bootstrap.sh              # Single-command platform deployment
-├── appplications/            # Core platform applications (ArgoCD manages these)
+├── applications/            # Core platform applications (ArgoCD manages these)
 │   ├── argocd.yaml           # ArgoCD manages itself
 │   ├── traefik.yaml          # Ingress controller
 │   ├── metallb.yaml          # Load balancer
@@ -61,13 +61,13 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.pas
 
 1. **Bootstrap** - `./bootstrap.sh` installs ArgoCD and applies platform applications
 2. **GitOps Loop** - ArgoCD monitors this repository and automatically deploys changes
-3. **Self-Managing** - ArgoCD manages its own configuration via the `appplications/argocd.yaml` application
+3. **Self-Managing** - ArgoCD manages its own configuration via the `applications/argocd.yaml` application
 4. **Environment Promotion** - Changes flow from `base/` → `overlays/production`
 
 ## Adding New Applications
 
 1. Create application structure in `apps/your-app/`
-2. Add ArgoCD Application manifest to `appplications/your-app.yaml`
+2. Add ArgoCD Application manifest to `applications/your-app.yaml`
 3. Commit and push - ArgoCD handles the rest
 
 ## Prerequisites

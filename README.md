@@ -23,7 +23,7 @@
 │   │           └── argocd-config.yaml
 │   └── metrics-server/
 │       └── ...
-└── appplications/
+└── applications/
     ├── kustomization.yaml
     ├── argocd.yaml           # ArgoCD manages itself
     └── metrics-server.yaml

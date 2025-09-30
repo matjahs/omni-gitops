@@ -1,7 +1,8 @@
+# applications/argocd.yaml
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: monitoring
+  name: argocd
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
@@ -11,12 +12,9 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/matjahs/omni-gitops.git
+    repoURL: https://github.com/matjahs/omni-gitops
     targetRevision: HEAD
-    path: apps/monitoring
-    directory:
-      recurse: false
-      include: 'application.yaml'
+    path: clusters/cluster1
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
@@ -26,9 +24,5 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
-    retry:
-      limit: 3
-      backoff:
-        duration: 5s
-        factor: 2
-        maxDuration: 3m
+      - PrunePropagationPolicy=foreground
+      - RespectIgnoreDifferences=true

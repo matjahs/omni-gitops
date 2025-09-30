@@ -111,7 +111,7 @@ kubectl wait --for=condition=available --timeout=300s \
   deployment/argocd-server -n argocd
 
 # Apply platform apps
-kubectl apply -k appplications/
+kubectl apply -k applications/
 ```
 
 **Manual alternative:**
