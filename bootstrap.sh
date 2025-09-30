@@ -104,13 +104,13 @@ preflight_checks() {
   fi
 
   # Check if we're in the right directory
-  if [[ ! -f "bootstrap/argocd/kustomization.yaml" ]]; then
-    log "bootstrap/argocd/kustomization.yaml not found. Are you in the repository root?" error
+  if [[ ! -f "clusters/cluster1/kustomization.yaml" ]]; then
+    log "clusters/cluster1/kustomization.yaml not found. Are you in the repository root?" error
     exit 1
   fi
 
-  if [[ ! -f "platform/kustomization.yaml" ]]; then
-    log "platform/kustomization.yaml not found. Are you in the repository root?" error
+  if [[ ! -f "appplications/kustomization.yaml" ]]; then
+    log "appplications/kustomization.yaml not found. Are you in the repository root?" error
     exit 1
   fi
 
@@ -141,7 +141,7 @@ install_argocd() {
   fi
 
   log "Installing ArgoCD..."
-  kubectl apply -k bootstrap/argocd/
+  kubectl apply -k clusters/cluster1/
 
   if [[ "$SKIP_WAIT" == "false" ]]; then
     log "Waiting for ArgoCD server to be ready (timeout: ${TIMEOUT}s)..."
@@ -158,7 +158,7 @@ install_argocd() {
 # Deploy platform applications
 deploy_platform() {
   log "Deploying platform applications..."
-  kubectl apply -k platform/
+  kubectl apply -k appplications/
 
   log "Waiting for applications to be created..."
   sleep 5

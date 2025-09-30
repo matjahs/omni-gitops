@@ -44,7 +44,7 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.pas
 
 ```
 ├── bootstrap.sh              # Single-command platform deployment
-├── platform/                 # Core platform applications (ArgoCD manages these)
+├── appplications/            # Core platform applications (ArgoCD manages these)
 │   ├── argocd.yaml           # ArgoCD manages itself
 │   ├── traefik.yaml          # Ingress controller
 │   ├── metallb.yaml          # Load balancer
@@ -53,21 +53,21 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.pas
 │   ├── traefik/base/         # Base Traefik configuration
 │   ├── metrics-server/base/  # Base metrics-server setup
 │   └── */overlays/production # Environment-specific overrides
-├── clusters/dev/             # Talos cluster configuration
-└── bootstrap/argocd/         # ArgoCD bootstrap manifests
+└── clusters/                 # Cluster bootstrapping manifests
+    └── cluster1/             # ArgoCD bootstrap for cluster1
 ```
 
 ## How It Works
 
 1. **Bootstrap** - `./bootstrap.sh` installs ArgoCD and applies platform applications
 2. **GitOps Loop** - ArgoCD monitors this repository and automatically deploys changes
-3. **Self-Managing** - ArgoCD manages its own configuration via the `platform/argocd.yaml` application
+3. **Self-Managing** - ArgoCD manages its own configuration via the `appplications/argocd.yaml` application
 4. **Environment Promotion** - Changes flow from `base/` → `overlays/production`
 
 ## Adding New Applications
 
 1. Create application structure in `apps/your-app/`
-2. Add ArgoCD Application manifest to `platform/your-app.yaml`
+2. Add ArgoCD Application manifest to `appplications/your-app.yaml`
 3. Commit and push - ArgoCD handles the rest
 
 ## Prerequisites

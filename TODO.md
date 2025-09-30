@@ -21,3 +21,4 @@
 - [x] traefik
 - [ ] vault
 - [x] monitoring (kube-prometheus-stack)
+- [x] persistent storage (Rook Ceph)

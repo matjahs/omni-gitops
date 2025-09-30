@@ -7,7 +7,7 @@
 #### ArgoCD Installation Fails
 **Symptoms:**
 ```bash
-kubectl apply -k bootstrap/argocd/
+kubectl apply -k clusters/cluster1/
 # Error: unable to apply manifests
 ```
 
@@ -494,8 +494,8 @@ argocd app sync --all
 # 1. Delete application
 kubectl delete application <app-name> -n argocd
 
-# 2. Recreate from platform
-kubectl apply -f platform/<app-name>.yaml
+# 2. Recreate from platform manifests
+kubectl apply -f appplications/<app-name>.yaml
 
 # 3. Wait for sync
 argocd app wait <app-name>

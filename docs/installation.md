@@ -104,14 +104,14 @@ The `bootstrap.sh` script performs these steps:
 
 ```bash
 # Install ArgoCD
-kubectl apply -k bootstrap/argocd/
+kubectl apply -k clusters/cluster1/
 
 # Wait for readiness
 kubectl wait --for=condition=available --timeout=300s \
   deployment/argocd-server -n argocd
 
 # Apply platform apps
-kubectl apply -k platform/
+kubectl apply -k appplications/
 ```
 
 **Manual alternative:**
@@ -122,7 +122,7 @@ kubectl apply -n argocd -f \
   https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
 
 # Apply custom configuration
-kubectl apply -k bootstrap/argocd/overlays/production/
+kubectl apply -k clusters/cluster1/overlays/production/
 ```
 
 ### Phase 3: Platform Services

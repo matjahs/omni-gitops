@@ -1,4 +1,4 @@
-# platform/argocd.yaml
+# appplications/argocd.yaml
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
@@ -14,7 +14,7 @@ spec:
   source:
     repoURL: https://github.com/matjahs/omni-gitops
     targetRevision: HEAD
-    path: bootstrap/argocd
+    path: clusters/cluster1
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd

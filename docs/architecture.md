@@ -64,10 +64,9 @@ This platform follows cloud-native principles with immutable infrastructure and 
 - Automatic drift detection and remediation
 
 **Repository Structure:**
-- `platform/` - Core infrastructure components
+- `appplications/` - Core infrastructure components
 - `apps/` - Application definitions with base/overlay pattern
-- `clusters/` - Talos machine configurations
-- `bootstrap/` - Initial ArgoCD installation
+- `clusters/` - Cluster bootstrapping and environment overlays (e.g. `cluster1`)
 
 ### Network Architecture
 
