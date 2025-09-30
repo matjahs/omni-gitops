@@ -14,6 +14,9 @@ spec:
     repoURL: https://github.com/matjahs/omni-gitops.git
     targetRevision: HEAD
     path: apps/monitoring
+    directory:
+      recurse: false
+      include: 'application.yaml'
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
