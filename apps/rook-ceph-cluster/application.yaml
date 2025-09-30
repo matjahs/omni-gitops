@@ -115,28 +115,6 @@ spec:
                 csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
                 csi.storage.k8s.io/fstype: ext4
 
-        # CephObjectStore for S3/Swift
-        cephObjectStores:
-          - name: ceph-objectstore
-            spec:
-              metadataPool:
-                failureDomain: host
-                replicated:
-                  size: 3
-              dataPool:
-                failureDomain: host
-                replicated:
-                  size: 3
-              gateway:
-                port: 80
-                instances: 2
-            storageClass:
-              enabled: true
-              name: ceph-bucket
-              reclaimPolicy: Delete
-              parameters:
-                region: us-east-1
-
   destination:
     server: https://kubernetes.default.svc
     namespace: rook-ceph
