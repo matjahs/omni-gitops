@@ -6,6 +6,7 @@ namespace: argocd
 resources:
 - argocd.yaml
 - cert-manager.yaml
+- external-secrets.yaml
 - hubble-ui.yaml
 - metallb.yaml
 - monitoring.yaml
