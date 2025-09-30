@@ -9,6 +9,8 @@ resources:
 - traefik.yaml
 - metallb.yaml
 - cert-manager.yaml
+- rook-ceph-operator.yaml
+- rook-ceph-cluster.yaml
 - monitoring.yaml
 # - hubble-ui.yaml
 

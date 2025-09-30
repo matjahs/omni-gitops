@@ -6,12 +6,17 @@ machine:
     modules:
       - name: nvme_tcp
       - name: vfio_pci
+  disks:
+    - device: /dev/sdb
+      partitions:
+        - mountpoint: /var/mnt/storage
   kubelet:
     extraMounts:
-      - destination: /var/lib/longhorn
+      - source: /var/mnt/storage
         type: bind
-        source: /var/lib/longhorn
+        destination: /var/lib/longhorn
         options:
           - bind
           - rshared
           - rw
+
