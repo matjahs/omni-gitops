@@ -5,14 +5,13 @@ namespace: argocd
 
 resources:
 - argocd.yaml
-- metrics-server.yaml
-- traefik.yaml
-- metallb.yaml
 - cert-manager.yaml
-- rook-ceph-operator.yaml
-- rook-ceph-cluster.yaml
+- hubble-ui.yaml
+- metallb.yaml
 - monitoring.yaml
-# - hubble-ui.yaml
+- rook-ceph-cluster.yaml
+- rook-ceph-operator.yaml
+- traefik.yaml
 
 commonAnnotations:
   argocd.argoproj.io/sync-wave: "0"
