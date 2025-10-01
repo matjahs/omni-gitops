@@ -1,0 +1,52 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: rook-ceph
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+  - list:
+      elements:
+      - component: operator
+        syncWave: "0"
+      - component: cluster
+        syncWave: "1"
+      - component: dashboard
+        syncWave: "2"
+  template:
+    metadata:
+      name: rook-ceph-{{.component}}
+      namespace: argocd
+      finalizers:
+        - resources-finalizer.argocd.argoproj.io
+      labels:
+        app.kubernetes.io/managed-by: argocd
+        app.kubernetes.io/part-of: platform
+        app.kubernetes.io/component: rook-ceph
+      annotations:
+        argocd.argoproj.io/sync-wave: "{{.syncWave}}"
+    spec:
+      project: default
+      source:
+        repoURL: https://github.com/matjahs/omni-gitops.git
+        targetRevision: HEAD
+        path: apps/rook-ceph/{{.component}}/overlays/production
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: rook-ceph
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace=true
+          - PrunePropagationPolicy=foreground
+          - RespectIgnoreDifferences=true
+        retry:
+          limit: 3
+          backoff:
+            duration: 5s
+            factor: 2
+            maxDuration: 3m

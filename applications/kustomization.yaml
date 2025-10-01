@@ -7,14 +7,11 @@ resources:
 - argocd.yaml
 - argocd-config.yaml
 - cert-manager.yaml
-- cert-manager-config.yaml
 - external-secrets.yaml
-- external-secrets-config.yaml
 - hubble-ui.yaml
 - metallb.yaml
 - monitoring.yaml
-- rook-ceph-cluster.yaml
-- rook-ceph-operator.yaml
+- rook-ceph.yaml
 - traefik.yaml
 - uptime-kuma.yaml
 
