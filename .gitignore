@@ -40,4 +40,5 @@ splunk/deployment-apps/forwarder_outputs/metadata/local.meta
 *secret.yaml
 !*-secret.yaml.example
 !*secret.yaml.example
+!*-externalsecret.yaml
 apps/base/external-secrets/vault-token-secret.yaml

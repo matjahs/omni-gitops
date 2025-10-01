@@ -4,8 +4,7 @@ kind: Kustomization
 resources:
 - ../../base
 - https://github.com/cert-manager/cert-manager/releases/latest/download/cert-manager.yaml
-# Note: cloudflare-secret.yaml must be applied manually or via External Secrets
-# See cloudflare-secret.yaml.example for template
+- cloudflare-externalsecret.yaml
 
 patches:
 - path: cert-manager-deployment-patch.yaml
