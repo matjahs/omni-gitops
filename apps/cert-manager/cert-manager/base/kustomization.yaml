@@ -8,3 +8,4 @@ resources:
 - wildcard-certificate.yaml
 - vault-serviceaccount.yaml
 - vault-clusterissuer.yaml
+- vault-issuer-rbac.yaml
