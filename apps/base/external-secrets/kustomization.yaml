@@ -1,0 +1,5 @@
+# Temporary shim to keep legacy Argo CD application path working during directory migration
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - ../../external-secrets/base
