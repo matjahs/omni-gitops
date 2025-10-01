@@ -8,6 +8,7 @@ resources:
 - argocd-config.yaml
 - cert-manager.yaml
 - external-secrets.yaml
+- external-secrets-config.yaml
 - hubble-ui.yaml
 - metallb.yaml
 - monitoring.yaml
