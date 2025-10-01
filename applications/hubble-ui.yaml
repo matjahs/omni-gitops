@@ -14,7 +14,7 @@ spec:
   source:
     repoURL: https://github.com/matjahs/omni-gitops.git
     targetRevision: HEAD
-    path: apps/kube-system/overlays/production
+    path: apps/kube-system/hubble-ui/overlays/production
   destination:
     server: https://kubernetes.default.svc
     namespace: kube-system

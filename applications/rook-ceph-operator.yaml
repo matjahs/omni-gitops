@@ -13,7 +13,7 @@ spec:
   source:
     repoURL: https://github.com/matjahs/omni-gitops.git
     targetRevision: HEAD
-    path: apps/rook-ceph/base
+    path: apps/rook-ceph/dashboard/base
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd

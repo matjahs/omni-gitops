@@ -2,37 +2,45 @@
 
 ## Overview
 
-This repository follows a **namespace-first** organizational pattern for managing Kubernetes resources with GitOps. Each application is organized by its target namespace, making it intuitive to locate resources and establish RBAC boundaries.
+This repository follows a **namespace-first, then app** organizational pattern for managing Kubernetes resources with GitOps. Applications are organized by namespace, then by application name, making it intuitive to locate resources, support multi-tenancy, and establish RBAC boundaries.
 
 ## Directory Structure
 
 ```
 omni-gitops/
-├── apps/                           # All application configurations
-│   ├── {namespace}/                # One directory per namespace
-│   │   ├── base/                   # Base manifests for the namespace
-│   │   │   ├── kustomization.yaml
-│   │   │   └── *.yaml              # Resource manifests
-│   │   └── overlays/               # Environment-specific customizations
-│   │       └── production/
-│   │           ├── kustomization.yaml
-│   │           ├── values.yaml     # Helm values (if using Helm)
-│   │           └── *.yaml          # Patches and additional resources
+├── apps/                              # All application configurations
+│   ├── {namespace}/                   # One directory per namespace
+│   │   └── {app}/                     # One directory per app within namespace
+│   │       ├── base/                  # Base manifests for the app
+│   │       │   ├── kustomization.yaml
+│   │       │   └── *.yaml             # Resource manifests
+│   │       └── overlays/              # Environment-specific customizations
+│   │           └── production/
+│   │               ├── kustomization.yaml
+│   │               ├── values.yaml    # Helm values (if using Helm)
+│   │               └── *.yaml         # Patches and additional resources
 │   ├── argocd/
+│   │   └── argocd/
 │   ├── cert-manager/
-│   ├── external-secrets/
-│   ├── metallb-system/
+│   │   └── cert-manager/
+│   ├── monitoring/
+│   │   └── kube-prometheus-stack/     # Can have multiple apps per namespace
 │   ├── traefik-system/
-│   └── default/                    # For workload apps
-├── applications/                   # ArgoCD Application manifests
+│   │   └── traefik/
+│   ├── customer-1/                    # Multi-tenant namespace example
+│   │   ├── app1/
+│   │   └── app2/
+│   └── default/                       # For workload apps
+│       └── config/
+├── applications/                      # ArgoCD Application manifests
 │   ├── cert-manager.yaml
 │   ├── traefik.yaml
 │   └── ...
-├── clusters/                       # Cluster-specific configurations
+├── clusters/                          # Cluster-specific configurations
 │   └── cluster1/
 │       ├── kustomization.yaml
 │       └── overlays/
-└── docs/                           # Documentation
+└── docs/                              # Documentation
 
 ```
 
@@ -49,7 +57,7 @@ Infrastructure and platform services that other applications depend on.
 - MetalLB (load balancer)
 - Rook-Ceph (storage)
 
-**Location:** `apps/{namespace}/`
+**Location:** `apps/{namespace}/{app-name}/`
 **Application Manifest:** `applications/{app-name}.yaml`
 
 ### Workload Applications
@@ -61,7 +69,7 @@ End-user applications and services.
 - Databases
 - Custom services
 
-**Location:** `apps/default/` or create a dedicated namespace directory
+**Location:** `apps/{namespace}/{app-name}/` (use `default` namespace or create dedicated namespace)
 **Application Manifest:** `applications/{app-name}.yaml`
 
 ## Adding New Applications
@@ -70,10 +78,10 @@ End-user applications and services.
 
 ```
 Is this a platform service?
-├─ YES → Create apps/{namespace}/ (use actual namespace name)
+├─ YES → Create apps/{namespace}/{app-name}/ (use actual namespace name)
 └─ NO → Is it part of a multi-tenant setup?
-    ├─ YES → Create apps/{tenant-namespace}/
-    └─ NO → Use apps/default/
+    ├─ YES → Create apps/{tenant-namespace}/{app-name}/
+    └─ NO → Use apps/default/{app-name}/
 ```
 
 ### Option 1: Kustomize-Based Application
@@ -83,13 +91,13 @@ Use this for applications where you have raw Kubernetes YAML manifests.
 #### Step 1: Create Directory Structure
 
 ```bash
-mkdir -p apps/{namespace}/base
-mkdir -p apps/{namespace}/overlays/production
+mkdir -p apps/{namespace}/{app-name}/base
+mkdir -p apps/{namespace}/{app-name}/overlays/production
 ```
 
 #### Step 2: Create Base Manifests
 
-**apps/{namespace}/base/kustomization.yaml:**
+**apps/{namespace}/{app-name}/base/kustomization.yaml:**
 ```yaml
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
@@ -102,7 +110,7 @@ resources:
 - ingress.yaml
 ```
 
-**apps/{namespace}/base/deployment.yaml:**
+**apps/{namespace}/{app-name}/base/deployment.yaml:**
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -127,7 +135,7 @@ spec:
 
 #### Step 3: Create Overlay
 
-**apps/{namespace}/overlays/production/kustomization.yaml:**
+**apps/{namespace}/{app-name}/overlays/production/kustomization.yaml:**
 ```yaml
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
@@ -144,7 +152,7 @@ patches:
     name: my-app
 ```
 
-**apps/{namespace}/overlays/production/replica-patch.yaml:**
+**apps/{namespace}/{app-name}/overlays/production/replica-patch.yaml:**
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -173,7 +181,7 @@ spec:
   source:
     repoURL: https://github.com/matjahs/omni-gitops.git
     targetRevision: HEAD
-    path: apps/{namespace}/overlays/production
+    path: apps/{namespace}/{app-name}/overlays/production
   destination:
     server: https://kubernetes.default.svc
     namespace: {namespace}
@@ -192,12 +200,12 @@ Use this for applications available as Helm charts.
 #### Step 1: Create Directory Structure
 
 ```bash
-mkdir -p apps/{namespace}/overlays/production
+mkdir -p apps/{namespace}/{app-name}/overlays/production
 ```
 
 #### Step 2: Create Helm Values File
 
-**apps/{namespace}/overlays/production/values.yaml:**
+**apps/{namespace}/{app-name}/overlays/production/values.yaml:**
 ```yaml
 # Helm chart values
 replicaCount: 3
@@ -238,7 +246,7 @@ spec:
     targetRevision: "1.0.0"
     helm:
       valueFiles:
-      - $values/apps/{namespace}/overlays/production/values.yaml
+      - $values/apps/{namespace}/{app-name}/overlays/production/values.yaml
   - repoURL: https://github.com/matjahs/omni-gitops.git
     targetRevision: HEAD
     ref: values
@@ -265,13 +273,13 @@ For Helm charts that need additional Kubernetes resources.
 #### Step 1: Create Structure
 
 ```bash
-mkdir -p apps/{namespace}/base
-mkdir -p apps/{namespace}/overlays/production
+mkdir -p apps/{namespace}/{app-name}/base
+mkdir -p apps/{namespace}/{app-name}/overlays/production
 ```
 
 #### Step 2: Base Resources
 
-**apps/{namespace}/base/kustomization.yaml:**
+**apps/{namespace}/{app-name}/base/kustomization.yaml:**
 ```yaml
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
@@ -285,7 +293,7 @@ resources:
 
 #### Step 3: Overlay with Helm Values
 
-**apps/{namespace}/overlays/production/kustomization.yaml:**
+**apps/{namespace}/{app-name}/overlays/production/kustomization.yaml:**
 ```yaml
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
@@ -296,7 +304,7 @@ resources:
 - ../../base
 ```
 
-**apps/{namespace}/overlays/production/values.yaml:**
+**apps/{namespace}/{app-name}/overlays/production/values.yaml:**
 ```yaml
 # Helm values
 replicaCount: 3
@@ -319,10 +327,10 @@ spec:
     targetRevision: "1.0.0"
     helm:
       valueFiles:
-      - $values/apps/{namespace}/overlays/production/values.yaml
+      - $values/apps/{namespace}/{app-name}/overlays/production/values.yaml
   - repoURL: https://github.com/matjahs/omni-gitops.git
     targetRevision: HEAD
-    path: apps/{namespace}/overlays/production
+    path: apps/{namespace}/{app-name}/overlays/production
   - repoURL: https://github.com/matjahs/omni-gitops.git
     targetRevision: HEAD
     ref: values
@@ -405,30 +413,33 @@ metadata:
 
 ## Common Patterns
 
-### Pattern: Platform Service
+### Pattern: Platform Service (Single App)
 
 ```
 apps/traefik-system/
-├── base/                    # Usually empty for pure Helm
-└── overlays/
-    └── production/
-        ├── kustomization.yaml
-        └── values.yaml      # Helm values
+└── traefik/                 # App name
+    ├── base/                # Usually empty for pure Helm
+    └── overlays/
+        └── production/
+            ├── kustomization.yaml
+            └── values.yaml  # Helm values
 
 applications/traefik.yaml    # Multi-source application
 ```
 
-### Pattern: Operator + Configuration
+### Pattern: Multiple Apps Per Namespace
 
 ```
 apps/external-secrets/
-├── base/
-│   ├── kustomization.yaml
-│   ├── cluster-secret-store.yaml
-│   └── vault-token-secret.yaml.example
-└── overlays/
-    └── production/
-        └── kustomization.yaml
+├── operator/                # Deployed via Helm (no directory needed)
+└── config/                  # Configuration resources
+    ├── base/
+    │   ├── kustomization.yaml
+    │   ├── cluster-secret-store.yaml
+    │   └── vault-token-secret.yaml.example
+    └── overlays/
+        └── production/
+            └── kustomization.yaml
 
 applications/external-secrets.yaml         # Helm chart for operator
 applications/external-secrets-config.yaml  # Configuration resources
@@ -438,17 +449,37 @@ applications/external-secrets-config.yaml  # Configuration resources
 
 ```
 apps/default/
-├── base/
-│   ├── kustomization.yaml
-│   ├── deployment.yaml
-│   ├── service.yaml
-│   └── ingress.yaml
-└── overlays/
-    └── production/
-        ├── kustomization.yaml
-        └── replica-patch.yaml
+└── my-workload/             # App name
+    ├── base/
+    │   ├── kustomization.yaml
+    │   ├── deployment.yaml
+    │   ├── service.yaml
+    │   └── ingress.yaml
+    └── overlays/
+        └── production/
+            ├── kustomization.yaml
+            └── replica-patch.yaml
 
 applications/my-workload.yaml
+```
+
+### Pattern: Multi-Tenant Namespace
+
+```
+apps/customer-1/             # Tenant namespace
+├── app1/                    # First app
+│   ├── base/
+│   └── overlays/production/
+├── app2/                    # Second app
+│   ├── base/
+│   └── overlays/production/
+└── app3/                    # Third app
+    ├── base/
+    └── overlays/production/
+
+applications/customer-1-app1.yaml
+applications/customer-1-app2.yaml
+applications/customer-1-app3.yaml
 ```
 
 ## Troubleshooting

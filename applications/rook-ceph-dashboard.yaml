@@ -13,7 +13,7 @@ spec:
   source:
     repoURL: https://github.com/matjahs/omni-gitops.git
     targetRevision: HEAD
-    path: apps/rook-ceph/overlays/production
+    path: apps/rook-ceph/dashboard/overlays/production
   destination:
     server: https://kubernetes.default.svc
     namespace: rook-ceph

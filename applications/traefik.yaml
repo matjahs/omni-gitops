@@ -16,7 +16,7 @@ spec:
     targetRevision: "31.1.1"
     helm:
       valueFiles:
-      - $values/apps/traefik-system/overlays/production/values.yaml
+      - $values/apps/traefik-system/traefik/overlays/production/values.yaml
   - repoURL: https://github.com/matjahs/omni-gitops.git
     targetRevision: HEAD
     ref: values
