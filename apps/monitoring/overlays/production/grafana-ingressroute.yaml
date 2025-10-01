@@ -13,5 +13,6 @@ spec:
         - kind: Service
           name: kube-prometheus-stack-grafana
           port: 80
+          scheme: http
   tls:
     secretName: grafana-tls-cert

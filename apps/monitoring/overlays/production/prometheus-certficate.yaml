@@ -11,3 +11,8 @@ spec:
   commonName: prometheus.apps.lab.mxe11.nl
   dnsNames:
     - prometheus.apps.lab.mxe11.nl
+    - alertmanager.apps.lab.mxe11.nl
+    - thanos.apps.lab.mxe11.nl
+    - loki.apps.lab.mxe11.nl
+    - tempo.apps.lab.mxe11.nl
+    - promtail.apps.lab.mxe11.nl
