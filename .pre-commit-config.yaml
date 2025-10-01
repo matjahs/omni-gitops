@@ -1,8 +1,8 @@
+---
 # Pre-commit hooks for GitOps repository validation
 # Install: pip install pre-commit
 # Setup: pre-commit install
 # Run manually: pre-commit run --all-files
-
 repos:
   # General file checks
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -12,24 +12,31 @@ repos:
         exclude: ^(.*\.patch|.*\.diff)$
       - id: end-of-file-fixer
       - id: check-yaml
-        args: ['--allow-multiple-documents']
+        args: [--allow-multiple-documents]
         exclude: |
           (?x)^(
             .*\.helmignore$|
             .*templates/.*\.yaml$|
             .*templates/.*\.yml$
           )
+      - id: check-merge-conflict
       - id: check-added-large-files
-        args: ['--maxkb=1000']
+        args: [--maxkb=1000]
       - id: check-merge-conflict
       - id: mixed-line-ending
+
+  # YAML formatting
+  - repo: https://github.com/lyz-code/yamlfix/
+    rev: main
+    hooks:
+      - id: yamlfix
 
   # YAML linting
   - repo: https://github.com/adrienverge/yamllint
     rev: v1.35.1
     hooks:
       - id: yamllint
-        args: ['-d', '{extends: relaxed, rules: {line-length: {max: 120}}}']
+        args: [-d, '{extends: relaxed, rules: {line-length: {max: 120}}}']
         exclude: |
           (?x)^(
             .*templates/.*\.yaml$|
@@ -37,32 +44,34 @@ repos:
           )
 
   # Kubernetes manifest validation
-  - repo: https://github.com/Lucas-C/pre-commit-hooks
-    rev: v1.5.5
+  - repo: https://github.com/Agilicus/pre-commit-hook-k8svalidate.git
+    rev: v0.0.8
     hooks:
-      - id: insert-license
-        name: Insert license header in shell scripts
-        files: \.sh$
-        args:
-          - --license-filepath
-          - scripts/LICENSE_HEADER
-          - --comment-style
-          - '#'
-        exclude: ^scripts/LICENSE_HEADER$
+      - id: k8svalidate
+        args: [--exclude, '**/*.patch.yaml']
+        files: .yaml$
 
   # Shell script validation
   - repo: https://github.com/shellcheck-py/shellcheck-py
     rev: v0.10.0.1
     hooks:
       - id: shellcheck
-        args: ['-x']
+        args: [-x]
+
+  # GitGuardian for secret detection
+  - repo: https://github.com/gitguardian/ggshield
+    rev: v1.43.0
+    hooks:
+      - id: ggshield
+        language_version: python3
+        stages: [pre-commit]
 
   # Secret detection
   - repo: https://github.com/Yelp/detect-secrets
     rev: v1.5.0
     hooks:
       - id: detect-secrets
-        args: ['--baseline', '.secrets.baseline']
+        args: [--baseline, .secrets.baseline]
         exclude: |
           (?x)^(
             .*\.example$|
@@ -85,7 +94,7 @@ repos:
         name: Validate Kustomize builds
         entry: scripts/validate-kustomize.sh
         language: script
-        files: 'kustomization\.yaml$'
+        files: kustomization\.yaml$
         pass_filenames: false
 
       # Validate ArgoCD Applications
@@ -93,7 +102,7 @@ repos:
         name: Validate ArgoCD Application manifests
         entry: scripts/validate-argocd-apps.sh
         language: script
-        files: '^applications/.*\.yaml$'
+        files: ^applications/.*\.yaml$
         pass_filenames: false
 
       # Check for required namespace in manifests
@@ -101,5 +110,5 @@ repos:
         name: Check namespace is defined
         entry: scripts/check-namespace.sh
         language: script
-        files: '^apps/.*\.yaml$'
-        exclude: 'kustomization\.yaml$'
+        files: ^apps/.*\.yaml$
+        exclude: kustomization\.yaml$

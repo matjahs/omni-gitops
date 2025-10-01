@@ -37,6 +37,9 @@ kind: IngressRoute
 metadata:
   name: argocd
   namespace: argocd
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: cd.apps.lab.mxe11.nl
+    external-dns.alpha.kubernetes.io/target: traefik.lab.mxe11.nl
 spec:
   entryPoints:
     - websecure

@@ -1,0 +1,22 @@
+# Production overlay for External-DNS with CloudFlare provider
+
+# CloudFlare provider configuration
+provider:
+  name: cloudflare
+
+# Domain filter - only manage records under these domains
+domainFilters:
+  - mxe11.nl
+
+# CloudFlare-specific settings
+extraArgs:
+  - --cloudflare-proxied  # Enable CloudFlare proxy (orange cloud)
+  - --cloudflare-dns-records-per-page=5000
+
+# Environment variables for CloudFlare authentication
+env:
+  - name: CF_API_TOKEN
+    valueFrom:
+      secretKeyRef:
+        name: cloudflare-api-token
+        key: api-token

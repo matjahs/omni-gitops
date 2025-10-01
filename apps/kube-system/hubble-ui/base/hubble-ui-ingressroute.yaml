@@ -3,6 +3,9 @@ kind: IngressRoute
 metadata:
   name: hubble-ui
   namespace: kube-system
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: hubble.apps.lab.mxe11.nl
+    external-dns.alpha.kubernetes.io/target: traefik.lab.mxe11.nl
 spec:
   entryPoints:
     - websecure

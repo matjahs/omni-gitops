@@ -3,6 +3,9 @@ kind: IngressRoute
 metadata:
   name: prometheus
   namespace: monitoring
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: prometheus.apps.lab.mxe11.nl
+    external-dns.alpha.kubernetes.io/target: traefik.lab.mxe11.nl
 spec:
   entryPoints:
     - websecure
