@@ -4,7 +4,7 @@ metadata:
   name: prometheus-cert
   namespace: monitoring
 spec:
-  secretName: prometheus-tls-cert
+  secretName: prometheus-tls-cert # pragma: allowlist secret
   issuerRef:
     name: cloudflare-dns-issuer
     kind: ClusterIssuer

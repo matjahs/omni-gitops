@@ -35,5 +35,9 @@ splunk/deployment-apps/forwarder_outputs/metadata/local.meta
 .idea/
 .dockerconfigjson
 
-# Secrets - do not commit
+# Secrets - NEVER commit real secrets!
+*-secret.yaml
+*secret.yaml
+!*-secret.yaml.example
+!*secret.yaml.example
 apps/base/external-secrets/vault-token-secret.yaml

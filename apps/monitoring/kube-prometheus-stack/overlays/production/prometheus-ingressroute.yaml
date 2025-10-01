@@ -14,4 +14,4 @@ spec:
           name: kube-prometheus-stack-prometheus
           port: 9090
   tls:
-    secretName: prometheus-tls-cert
+    secretName: prometheus-tls-cert # pragma: allowlist secret

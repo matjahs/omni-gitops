@@ -13,4 +13,4 @@ spec:
         - name: hubble-ui
           port: 80
   tls:
-    secretName: hubble-ui-tls
+    secretName: hubble-ui-tls # pragma: allowlist secret

@@ -4,7 +4,7 @@ metadata:
   name: wildcard-apps-lab-mxe11-nl
   namespace: cert-manager
 spec:
-  secretName: wildcard-apps-lab-mxe11-nl-tls
+  secretName: wildcard-apps-lab-mxe11-nl-tls # pragma: allowlist secret
   issuerRef:
     name: cloudflare-dns-issuer
     kind: ClusterIssuer

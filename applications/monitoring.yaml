@@ -13,10 +13,10 @@ spec:
   source:
     repoURL: https://github.com/matjahs/omni-gitops.git
     targetRevision: HEAD
-    path: apps/monitoring/kube-prometheus-stack/base
+    path: apps/monitoring/kube-prometheus-stack/overlays/production
   destination:
     server: https://kubernetes.default.svc
-    namespace: argocd
+    namespace: monitoring
   syncPolicy:
     automated:
       prune: true

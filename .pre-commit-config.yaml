@@ -1,0 +1,105 @@
+# Pre-commit hooks for GitOps repository validation
+# Install: pip install pre-commit
+# Setup: pre-commit install
+# Run manually: pre-commit run --all-files
+
+repos:
+  # General file checks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: ^(.*\.patch|.*\.diff)$
+      - id: end-of-file-fixer
+      - id: check-yaml
+        args: ['--allow-multiple-documents']
+        exclude: |
+          (?x)^(
+            .*\.helmignore$|
+            .*templates/.*\.yaml$|
+            .*templates/.*\.yml$
+          )
+      - id: check-added-large-files
+        args: ['--maxkb=1000']
+      - id: check-merge-conflict
+      - id: mixed-line-ending
+
+  # YAML linting
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.35.1
+    hooks:
+      - id: yamllint
+        args: ['-d', '{extends: relaxed, rules: {line-length: {max: 120}}}']
+        exclude: |
+          (?x)^(
+            .*templates/.*\.yaml$|
+            .*templates/.*\.yml$
+          )
+
+  # Kubernetes manifest validation
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: v1.5.5
+    hooks:
+      - id: insert-license
+        name: Insert license header in shell scripts
+        files: \.sh$
+        args:
+          - --license-filepath
+          - scripts/LICENSE_HEADER
+          - --comment-style
+          - '#'
+        exclude: ^scripts/LICENSE_HEADER$
+
+  # Shell script validation
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.10.0.1
+    hooks:
+      - id: shellcheck
+        args: ['-x']
+
+  # Secret detection
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        args: ['--baseline', '.secrets.baseline']
+        exclude: |
+          (?x)^(
+            .*\.example$|
+            package-lock\.json$
+          )
+
+  # Kubernetes schema validation with kubeconform
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v3.4.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]
+        args: []
+
+  # Custom local hooks
+  - repo: local
+    hooks:
+      # Validate Kustomize builds
+      - id: kustomize-build
+        name: Validate Kustomize builds
+        entry: scripts/validate-kustomize.sh
+        language: script
+        files: 'kustomization\.yaml$'
+        pass_filenames: false
+
+      # Validate ArgoCD Applications
+      - id: validate-argocd-apps
+        name: Validate ArgoCD Application manifests
+        entry: scripts/validate-argocd-apps.sh
+        language: script
+        files: '^applications/.*\.yaml$'
+        pass_filenames: false
+
+      # Check for required namespace in manifests
+      - id: check-namespace
+        name: Check namespace is defined
+        entry: scripts/check-namespace.sh
+        language: script
+        files: '^apps/.*\.yaml$'
+        exclude: 'kustomization\.yaml$'

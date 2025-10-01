@@ -4,7 +4,7 @@ metadata:
   name: grafana-cert
   namespace: monitoring
 spec:
-  secretName: grafana-tls-cert
+  secretName: grafana-tls-cert # pragma: allowlist secret
   issuerRef:
     name: cloudflare-dns-issuer
     kind: ClusterIssuer

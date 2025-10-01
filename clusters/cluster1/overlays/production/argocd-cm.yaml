@@ -21,7 +21,7 @@ data:
       - CiliumIdentity
       clusters:
       - "*"
-  
+
   # dex.config: |
   #   connectors:
   #     - type: github

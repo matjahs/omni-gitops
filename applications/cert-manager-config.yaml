@@ -1,37 +1,30 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: external-secrets
+  name: cert-manager-config
   namespace: argocd
   finalizers:
     - resources-finalizer.argocd.argoproj.io
   labels:
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/part-of: platform
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"  # Deploy after cert-manager
 spec:
   project: default
   source:
-    chart: external-secrets
-    repoURL: https://charts.external-secrets.io
-    targetRevision: 0.11.0
-    helm:
-      releaseName: external-secrets
-      values: |
-        installCRDs: true
-        webhook:
-          port: 9443
-        certController:
-          requeueInterval: 5m
+    repoURL: https://github.com/matjahs/omni-gitops.git
+    targetRevision: HEAD
+    path: apps/cert-manager/cert-manager/base
   destination:
     server: https://kubernetes.default.svc
-    namespace: external-secrets
+    namespace: cert-manager
   syncPolicy:
     automated:
       prune: true
       selfHeal: true
     syncOptions:
-      - CreateNamespace=true
-      - ServerSideApply=true
+      - CreateNamespace=false
     retry:
       limit: 3
       backoff:

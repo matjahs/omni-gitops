@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Copyright (c) 2024 Matjah
+# SPDX-License-Identifier: MIT
+
 set -euo pipefail
 
 # Colors for output

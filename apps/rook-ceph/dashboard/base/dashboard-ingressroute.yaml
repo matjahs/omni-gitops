@@ -14,4 +14,4 @@ spec:
           port: 8443
           scheme: https
   tls:
-    secretName: ceph-dashboard-tls
+    secretName: ceph-dashboard-tls # pragma: allowlist secret

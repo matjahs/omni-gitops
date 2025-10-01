@@ -113,7 +113,7 @@ To add more secrets from Vault:
 
 1. Store the secret in Vault:
    ```bash
-   vault kv put secret/my-app username="admin" password="secret123"
+   vault kv put secret/my-app username="admin" password="secret123" # pragma: allowlist secret
    ```
 
 2. Create an ExternalSecret manifest in `apps/base/external-secrets/`:

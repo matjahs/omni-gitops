@@ -34,14 +34,14 @@ extraObjects:
     type: kubernetes.io/basic-auth
     stringData:
       username: admin
-      password: changeme
+      password: changeme # pragma: allowlist secret
   - apiVersion: traefik.io/v1alpha1
     kind: Middleware
     metadata:
       name: dashboard-auth
     spec:
       basicAuth:
-        secret: dashboard-auth-secret
+        secret: dashboard-auth-secret # pragma: allowlist secret
 
 ingressClass:
   enabled: true

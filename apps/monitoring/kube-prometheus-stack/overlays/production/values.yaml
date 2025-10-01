@@ -31,7 +31,7 @@ ingress:
         - path: /
           pathType: Prefix
   tls:
-    - secretName: uptime-kuma-tls
+    - secretName: uptime-kuma-tls # pragma: allowlist secret
       hosts:
         - uptime.apps.lab.mxe11.nl
 

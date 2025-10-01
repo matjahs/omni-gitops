@@ -189,7 +189,7 @@ metadata:
   name: test-vault-cert
   namespace: default
 spec:
-  secretName: test-vault-cert-tls
+  secretName: test-vault-cert-tls # pragma: allowlist secret
   issuerRef:
     name: vault-pki-issuer
     kind: ClusterIssuer

@@ -4,7 +4,7 @@ metadata:
   name: ceph-dashboard-tls
   namespace: rook-ceph
 spec:
-  secretName: ceph-dashboard-tls
+  secretName: ceph-dashboard-tls # pragma: allowlist secret
   issuerRef:
     name: cloudflare-dns-issuer
     kind: ClusterIssuer

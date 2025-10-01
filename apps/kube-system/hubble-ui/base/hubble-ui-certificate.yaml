@@ -4,7 +4,7 @@ metadata:
   name: hubble-ui-tls
   namespace: kube-system
 spec:
-  secretName: hubble-ui-tls
+  secretName: hubble-ui-tls # pragma: allowlist secret
   issuerRef:
     name: cloudflare-dns-issuer
     kind: ClusterIssuer

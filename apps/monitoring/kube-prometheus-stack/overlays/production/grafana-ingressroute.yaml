@@ -15,4 +15,4 @@ spec:
           port: 80
           scheme: http
   tls:
-    secretName: grafana-tls-cert
+    secretName: grafana-tls-cert # pragma: allowlist secret

@@ -345,6 +345,158 @@ spec:
       - CreateNamespace=true
 ```
 
+## Bootstrapping ArgoCD with App-of-Apps Pattern
+
+The **App-of-Apps pattern** allows ArgoCD to automatically manage all your applications from a single root Application. This is the recommended approach for production deployments.
+
+### How It Works
+
+```
+┌─────────────────────────────────────────┐
+│  clusters/cluster1/                     │
+│  └── base/root-applications.yaml       │ ← The ROOT app (app-of-apps)
+│      (ArgoCD Application)               │   Points to ↓
+└─────────────────────────────────────────┘
+                  │
+                  │ watches
+                  ↓
+┌─────────────────────────────────────────┐
+│  applications/                          │ ← Directory of child apps
+│  ├── kustomization.yaml                 │
+│  ├── cert-manager.yaml                  │
+│  ├── traefik.yaml                       │
+│  ├── monitoring.yaml                    │
+│  └── ... (all your apps)                │
+└─────────────────────────────────────────┘
+```
+
+**The Concept:**
+- **Parent Application** (`root-applications`): Watches the `applications/` directory
+- **Child Applications**: All ArgoCD Applications in `applications/` directory
+- When you add a new app to `applications/`, ArgoCD automatically creates it
+- True GitOps: Everything managed through Git commits
+
+### Setup Instructions
+
+#### Step 1: Create the Root Application
+
+**clusters/cluster1/base/root-applications.yaml:**
+```yaml
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: root-applications
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/matjahs/omni-gitops.git
+    targetRevision: HEAD
+    path: applications
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+```
+
+#### Step 2: Add to Cluster Kustomization
+
+**clusters/cluster1/kustomization.yaml:**
+```yaml
+resources:
+# ... existing resources ...
+- base/root-applications.yaml  # Add this line
+```
+
+#### Step 3: Commit and Deploy
+
+```bash
+# Commit changes
+git add clusters/cluster1/
+git commit -m "feat: add app-of-apps root application"
+git push
+
+# ArgoCD will automatically:
+# 1. Detect the new root-applications Application
+# 2. Sync it
+# 3. Create all child Applications from applications/ directory
+```
+
+### Adding New Applications
+
+Once the root application is set up, adding new apps is simple:
+
+```bash
+# 1. Create app structure
+mkdir -p apps/{namespace}/{app-name}/{base,overlays/production}
+
+# 2. Add manifests
+# ... create your Kubernetes resources ...
+
+# 3. Create ArgoCD Application manifest
+cat > applications/my-new-app.yaml <<EOF
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: my-new-app
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/matjahs/omni-gitops.git
+    targetRevision: HEAD
+    path: apps/{namespace}/{app-name}/overlays/production
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: {namespace}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+EOF
+
+# 4. Add to applications/kustomization.yaml
+echo "- my-new-app.yaml" >> applications/kustomization.yaml
+
+# 5. Commit and push
+git add apps/ applications/
+git commit -m "feat: add my-new-app"
+git push
+
+# ArgoCD automatically creates the app!
+```
+
+### Verification
+
+```bash
+# Check all applications
+argocd app list
+
+# Or with kubectl
+kubectl get applications -n argocd
+
+# Watch the root app
+argocd app get root-applications
+
+# View in UI
+# https://argocd.your-domain.com/applications
+```
+
+### Benefits
+
+- **Automated Deployment**: New apps deploy automatically on Git push
+- **Centralized Management**: All apps defined in `applications/` directory
+- **Version Control**: Full history of what apps exist in the cluster
+- **Easy Rollback**: Revert Git commits to remove apps
+- **Multi-Cluster Ready**: Create `root-applications` per cluster
+
 ## Best Practices
 
 ### Naming Conventions
@@ -359,7 +511,7 @@ spec:
 
 1. Store secrets in Vault at `http://172.16.0.4:8200`
 2. Create ExternalSecret resource in `apps/{namespace}/base/`
-3. Reference ClusterSecretStore: `vault-backend`
+3. Reference ClusterSecretStore: `vault-backend` <!-- pragma: allowlist secret -->
 
 **Example ExternalSecret:**
 ```yaml
@@ -377,7 +529,7 @@ spec:
     name: my-secret
     creationPolicy: Owner
   data:
-  - secretKey: password
+  - secretKey: password # pragma: allowlist secret
     remoteRef:
       key: my-app
       property: password

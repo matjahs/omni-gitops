@@ -49,4 +49,4 @@ spec:
           port: 80
           scheme: http
   tls:
-    secretName: argocd-tls-cert
+    secretName: argocd-tls-cert # pragma: allowlist secret
