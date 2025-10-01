@@ -9,6 +9,6 @@ spec:
     auth:
       kubernetes:
         role: cert-manager
-        mountPath: kubernetes
+        mountPath: /auth/kubernetes
         serviceAccountRef:
           name: cert-manager-vault-issuer
