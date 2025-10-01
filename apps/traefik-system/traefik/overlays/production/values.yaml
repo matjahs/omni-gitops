@@ -47,6 +47,11 @@ ingressClass:
   enabled: true
 
 providers:
+  kubernetesCRD:
+    enabled: true
+    allowEmptyServices: true
+    nativeLBByDefault: true
+    throttleDuration: 2s
   kubernetesIngress:
     enabled: true
   kubernetesGateway:
@@ -60,4 +65,8 @@ logs:
 
 metrics:
   prometheus:
+    enabled: true
+
+tracing:
+  otlp:
     enabled: true

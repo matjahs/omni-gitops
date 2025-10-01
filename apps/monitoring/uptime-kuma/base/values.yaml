@@ -1,0 +1,60 @@
+# Uptime Kuma default values
+# Override these in overlays/production/values.yaml
+
+uptime-kuma:
+  # Default configuration
+  # Add your specific values here
+
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+
+  livenessProbe:
+    enabled: true
+    failureThreshold: 3
+    # Uptime-Kuma recommends to configure a delay of 180 seconds until the server fully started.
+    # https://github.com/louislam/uptime-kuma/blob/ae224f9e188b1fc32ed8729818710975589cdce7/extra/healthcheck.go#L3
+    initialDelaySeconds: 180
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 2
+    # The NodeJS Version of this Healthcheck is no longer supported, therefore we don't specify a node command.
+    # https://github.com/louislam/uptime-kuma/blob/ae224f9e188b1fc32ed8729818710975589cdce7/extra/healthcheck.js#L6
+    exec:
+      command:
+        - "extra/healthcheck"
+
+
+  podSecurityContext: {}
+
+  dnsConfig:
+    nameservers:
+      - 172.16.0.53
+      - 172.16.20.10
+      - 172.16.0.1
+    searches:
+      - default.svc.cluster.local
+      - svc.cluster.local
+      - cluster.local
+      - corp.mxe11.nl
+      - lab.mxe11.nl
+      - mxe11.nl
+
+  # prometheus ServiceMonitor configuratoin
+  serviceMonitor:
+    enabled: true
+    interval: 30s
+    scrapeTimeout: 10s
+    metricRelabelings: []
+    relabelings: []
+    additionalLabels: {}
+    namespace: monitoring
+    selector:
+      matchLabels:
+        app.kubernetes.io/name: uptime-kuma
+        app.kubernetes.io/instance: uptime-kuma
