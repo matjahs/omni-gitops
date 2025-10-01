@@ -19,7 +19,7 @@ spec:
   source:
     repoURL: https://traefik.github.io/charts
     chart: traefik
-    targetRevision: "31.1.1"
+    targetRevision: "37.1.1"
     helm:
       values: |
         # Inline YAML values here
@@ -45,7 +45,7 @@ spec:
   sources:
   - repoURL: https://traefik.github.io/charts
     chart: traefik
-    targetRevision: "31.1.1"
+    targetRevision: "37.1.1"
     helm:
       valueFiles:
       - $values/apps/traefik-system/overlays/production/values.yaml
@@ -96,7 +96,7 @@ Pattern:
 ### Implementation Notes
 
 Applications migrated to this pattern:
-- Traefik (chart v31.1.1)
+- Traefik (chart v37.1.1)
 - MetalLB (chart v0.15.2)
 
 Template for new Helm-based applications:
