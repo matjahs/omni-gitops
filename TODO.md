@@ -1,3 +1,22 @@
+## ArgoCD Automation & Templates
+
+- [ ] Create script to generate ArgoCD Applications
+- [ ] Create script to generate ArgoCD AppProjects and RBAC policies
+- [ ] Add templates for common application patterns
+- [ ] Update documentation with helper script usage
+
+## ArgoCD Automation & Templates
+
+- [ ] Create script to generate ArgoCD Applications
+- [ ] Create script to generate ArgoCD AppProjects and RBAC policies
+- [ ] Add templates for common application patterns
+- [ ] Update documentation with helper script usage
+
+
+- [ ] Create script to generate ArgoCD Applications
+- [ ] Create script to generate ArgoCD AppProjects and RBAC policies
+- [ ] Add templates for common application patterns
+- [ ] Update documentation with helper script usage
 # TODO
 
 - [x] deploy HashiCorp Vault integration (http://vault.mxe11.nl:8200)

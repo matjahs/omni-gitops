@@ -1,0 +1,19 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: <APP_NAME>
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: <HELM_REPO_URL>
+    chart: <HELM_CHART_NAME>
+    targetRevision: <HELM_CHART_VERSION>
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: <DEST_NAMESPACE>
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
