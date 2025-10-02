@@ -1,3 +1,4 @@
+---
 apiVersion: traefik.io/v1alpha1
 kind: IngressRoute
 metadata:
@@ -7,14 +8,13 @@ metadata:
     external-dns.alpha.kubernetes.io/hostname: ceph.apps.lab.mxe11.nl
     external-dns.alpha.kubernetes.io/target: traefik.lab.mxe11.nl
 spec:
-  entryPoints:
-    - websecure
+  entryPoints: [websecure]
   routes:
     - match: Host(`ceph.apps.lab.mxe11.nl`)
       kind: Rule
       services:
         - name: rook-ceph-mgr-dashboard
-          port: 8443
-          scheme: https
+          port: 7000
+          scheme: http
   tls:
-    secretName: ceph-dashboard-tls # pragma: allowlist secret
+    secretName: ceph-dashboard-tls  # pragma: allowlist secret
