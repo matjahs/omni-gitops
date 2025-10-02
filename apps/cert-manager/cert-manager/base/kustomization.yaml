@@ -1,11 +1,5 @@
+---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-
 namespace: cert-manager
-
-resources:
-- cloudflare-clusterissuer.yaml
-- wildcard-certificate.yaml
-- vault-serviceaccount.yaml
-- vault-clusterissuer.yaml
-- vault-issuer-rbac.yaml
+resources: [cloudflare-clusterissuer.yaml, wildcard-certificate.yaml]

@@ -103,8 +103,10 @@ kubectl get secret cloudflare-api-token -n cert-manager
 
 ```
 secret/
-├── cloudflare/
+├── cloudflare
 │   └── api-token       # Cloudflare API token for cert-manager and ArgoCD
+└── external-dns
+    └── cloudflare-api-token  # Cloudflare API token for external-dns
 ```
 
 ### Adding More Secrets
@@ -144,47 +146,14 @@ To add more secrets from Vault:
 
 3. Add it to [apps/base/external-secrets/kustomization.yaml](../apps/base/external-secrets/kustomization.yaml)
 
-## Authentication Methods
+## Authentication Method
 
-### Current: Token Authentication
-- **Pros:** Simple setup
+### Token Authentication (Current)
+- **Pros:** Simple setup, centralized through External Secrets Operator
 - **Cons:** Manual token rotation required
+- **Security:** Token has read-only access to `secret/data/*` via `external-secrets-policy`
 
-### Recommended: Kubernetes Authentication
-
-Configure Vault to authenticate using ServiceAccount tokens:
-
-```bash
-# Enable Kubernetes auth
-vault auth enable kubernetes
-
-# Configure Kubernetes auth
-vault write auth/kubernetes/config \
-    kubernetes_host="https://kubernetes.default.svc:443"
-
-# Create a role
-vault write auth/kubernetes/role/external-secrets \
-    bound_service_account_names=external-secrets \
-    bound_service_account_namespaces=external-secrets \
-    policies=external-secrets-policy \
-    ttl=24h
-```
-
-Update ClusterSecretStore to use Kubernetes auth:
-```yaml
-spec:
-  provider:
-    vault:
-      server: "http://vault.mxe11.nl:8200"
-      path: "secret"
-      version: "v2"
-      auth:
-        kubernetes:
-          mountPath: "kubernetes"
-          role: "external-secrets"
-          serviceAccountRef:
-            name: external-secrets
-```
+All secret syncing is handled by the External Secrets Operator using a single Vault token. Individual applications (cert-manager, external-dns, etc.) consume standard Kubernetes secrets created by ESO - they do not directly access Vault.
 
 ## Troubleshooting
 
