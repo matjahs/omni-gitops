@@ -1,0 +1,109 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: cilium-app-set
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: '2'
+spec:
+  goTemplate: true
+  generators:
+    - plugin:
+        configMapRef:
+          name: secret-var-plugin-generator
+        input:
+          parameters:
+            secret_vars: [cilium_hostname, vouch_hostname]
+  template:
+    metadata:
+      name: cilium-helm-release
+    spec:
+      project: cilium
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: kube-system  # Changed from 'cilium' to match existing installation
+      syncPolicy:
+        syncOptions:
+          - CreateNamespace=true
+          - ServerSideApply=true  # CRITICAL for Talos
+          - ApplyOutOfSync=true
+        automated:
+          prune: true
+          selfHeal: true
+      sources:
+        - repoURL: https://helm.cilium.io/
+          chart: cilium
+          targetRevision: 1.18.2  # Upgrade from 1.18.1 to 1.18.2
+          helm:
+            releaseName: cilium  # Match existing Helm release name
+            values: |-
+              # Core Talos-specific configuration
+              k8sServiceHost: localhost
+              k8sServicePort: 7445
+              ipam:
+                mode: kubernetes
+              kubeProxyReplacement: true
+              routingMode: tunnel
+              tunnelProtocol: vxlan
+
+              # Security context - required for Talos
+              securityContext:
+                capabilities:
+                  ciliumAgent:
+                    - CHOWN
+                    - KILL
+                    - NET_ADMIN
+                    - NET_RAW
+                    - IPC_LOCK
+                    - SYS_ADMIN
+                    - SYS_RESOURCE
+                    - DAC_OVERRIDE
+                    - FOWNER
+                    - SETGID
+                    - SETUID
+                  cleanCiliumState:
+                    - NET_ADMIN
+                    - SYS_ADMIN
+                    - SYS_RESOURCE
+
+              # Cgroup configuration for Talos
+              cgroup:
+                autoMount:
+                  enabled: false
+                hostRoot: /sys/fs/cgroup
+
+              # Operator configuration
+              operator:
+                replicas: 1
+
+              # BGP Control Plane
+              bgpControlPlane:
+                enabled: true
+
+              # Gateway API
+              gatewayAPI:
+                enabled: true
+                enableAlpn: true
+                enableAppProtocol: true
+
+              # Hubble configuration
+              hubble:
+                enabled: true
+                metrics:
+                  enabled:
+                    - dns
+                    - drop
+                    - tcp
+                    - flow
+                    - port-distribution
+                relay:
+                  enabled: true
+                ui:
+                  enabled: true
+                  ingress:
+                    enabled: true
+                    annotations:
+                      cert-manager.io/cluster-issuer: {{ .global_cluster_issuer }}
+                    hosts:
+                      - {{ .cilium_hostname }}

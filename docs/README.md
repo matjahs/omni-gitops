@@ -78,11 +78,21 @@ kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.pas
 
 ## Documentation
 
+### Core Platform
 - [Architecture & Design](architecture.md)
 - [Installation Guide](installation.md)
 - [Platform Components](platform-components.md)
-- [Application Deployment](application-deployment.md)
+- [Application Deployment](app-deployment.md)
 - [Troubleshooting](troubleshooting.md)
+
+### Networking (Cilium & Gateway API)
+- [Cilium + ArgoCD Handoff Guide](cilium-argocd-handoff.md) - How Cilium transitions from Talos to ArgoCD management
+- [Cilium Operations Guide](cilium-operations-guide.md) - Day-to-day Cilium operations and troubleshooting
+- [Gateway API Migration Plan](gateway-api-migration-plan.md) - Comprehensive plan to migrate from Traefik to Cilium Gateway API
+- [Gateway API Quick Reference](gateway-api-quick-reference.md) - Common patterns and quick commands
+
+### Infrastructure
+- [Omni/Talos Configuration](../omni/README.md) - Cluster bootstrap and Talos configuration details
 
 ## Cluster Information
 
