@@ -1,19 +1,28 @@
+---
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
   name: monitoring
   namespace: argocd
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
+  finalizers: [resources-finalizer.argocd.argoproj.io]
   labels:
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/part-of: platform
 spec:
   project: default
-  source:
-    repoURL: https://github.com/matjahs/omni-gitops.git
-    targetRevision: HEAD
-    path: apps/monitoring/kube-prometheus-stack/overlays/production
+  sources:
+    - repoURL: https://prometheus-community.github.io/helm-charts
+      chart: kube-prometheus-stack
+      targetRevision: 68.2.2
+      helm:
+        valueFiles:
+          - $values/apps/monitoring/kube-prometheus-stack/base/values.yaml
+    - repoURL: https://github.com/matjahs/omni-gitops.git
+      targetRevision: HEAD
+      ref: values
+    - repoURL: https://github.com/matjahs/omni-gitops.git
+      targetRevision: HEAD
+      path: apps/monitoring/kube-prometheus-stack/overlays/production
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring
@@ -21,8 +30,7 @@ spec:
     automated:
       prune: true
       selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
+    syncOptions: [CreateNamespace=true, ServerSideApply=true]
     retry:
       limit: 3
       backoff:
