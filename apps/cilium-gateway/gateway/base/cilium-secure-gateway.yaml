@@ -1,0 +1,27 @@
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: cilium-secure-gateway
+  namespace: cilium-gateway-system
+  annotations:
+    # Cert-manager will use the existing wildcard certificate
+    cert-manager.io/cluster-issuer: cloudflare-dns-issuer
+    # Initially no external-dns - we'll add after migration
+    # external-dns.alpha.kubernetes.io/hostname: "*.apps.lab.mxe11.nl"
+spec:
+  gatewayClassName: cilium
+  listeners:
+    - name: https
+      protocol: HTTPS
+      port: 443
+      hostname: '*.apps.lab.mxe11.nl'
+      allowedRoutes:
+        namespaces:
+          from: All  # Allow HTTPRoutes from any namespace
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - kind: Secret
+            name: wildcard-apps-lab-mxe11-nl-tls
+            namespace: cert-manager
