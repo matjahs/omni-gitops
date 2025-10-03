@@ -40,6 +40,10 @@ spec:
       namespace: cilium-gateway-system
   hostnames: [cd.apps.lab.mxe11.nl]
   rules:
-    - backendRefs:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
         - name: argocd-server
           port: 80  # ArgoCD server runs on HTTP internally
