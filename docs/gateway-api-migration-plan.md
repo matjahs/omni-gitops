@@ -254,7 +254,11 @@ Applied to either:
 - [ ] TLS certificate issued by cert-manager
 - [ ] DNS records created by external-dns
 
-### Phase 2: Migrate Services One-by-One (Weeks 3-4)
+### Phase 2: Migrate Services One-by-One (Weeks 3-4) ✅ COMPLETED
+
+**Status**: Completed on 2025-10-03
+
+All services successfully migrated from Traefik IngressRoutes to Cilium Gateway API HTTPRoutes.
 
 Migrate in order of criticality (least critical first):
 
@@ -473,10 +477,18 @@ spec:
   ```
 
 **Deliverables per migration:**
-- [ ] HTTPRoute created
-- [ ] Service tested via new route
-- [ ] Old IngressRoute deleted (after verification)
-- [ ] DNS updated (if needed)
+- [x] HTTPRoute created
+- [x] Service tested via new route
+- [x] Old IngressRoute deleted (after verification)
+- [x] DNS updated (if needed)
+
+**Services Migrated:**
+- [x] Uptime Kuma (`uptime.apps.lab.mxe11.nl`)
+- [x] Hubble UI (`hubble.apps.lab.mxe11.nl`)
+- [x] Ceph Dashboard (`ceph.apps.lab.mxe11.nl`)
+- [x] Grafana (`grafana.apps.lab.mxe11.nl`)
+- [x] Prometheus (`prometheus.apps.lab.mxe11.nl`)
+- [x] ArgoCD (`cd.apps.lab.mxe11.nl`) - with HTTP redirect and ACME challenge handling
 
 ### Phase 3: Decommission Traefik (Week 5)
 

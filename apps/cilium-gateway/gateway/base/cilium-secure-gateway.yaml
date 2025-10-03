@@ -24,4 +24,3 @@ spec:
         certificateRefs:
           - kind: Secret
             name: wildcard-apps-lab-mxe11-nl-tls
-            namespace: cert-manager
