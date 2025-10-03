@@ -13,7 +13,6 @@ domainFilters:
   - mxe11.nl
 # CloudFlare-specific settings
 extraArgs:
-  - --cloudflare-proxied  # Enable CloudFlare proxy (orange cloud)
   - --cloudflare-dns-records-per-page=5000
 # Environment variables for CloudFlare authentication
 env:
