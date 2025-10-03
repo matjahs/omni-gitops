@@ -36,12 +36,6 @@ splunk/deployment-apps/forwarder_outputs/metadata/local.meta
 .dockerconfigjson
 
 # Secrets - NEVER commit real secrets!
-*-secret.yaml
-*secret.yaml
-!*-secret.yaml.example
-!*secret.yaml.example
-!*-externalsecret.yaml
-apps/base/external-secrets/vault-token-secret.yaml
 .taskfiles/talos/bootstrap.yaml
 .taskfiles/talos/config.yaml
 .taskfiles/talos/helpers.yaml
