@@ -1,3 +1,4 @@
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -14,6 +15,21 @@ data:
       generate:
         command: [sh, -c]
         args: ["argocd-flux-plugin . --path $GIT_PATH"]
+    - name: argocd-vault-plugin
+      generate:
+        command: ["argocd-vault-plugin"]
+        args: ["generate", "./"]
+    - name: argocd-vault-plugin-helm
+      init:
+        command: [sh, -c]
+        args: ["helm dependency build"]
+      generate:
+        command: ["sh", "-c"]
+        args: ["helm template $ARGOCD_APP_NAME -n $ARGOCD_APP_NAMESPACE ${ARGOCD_ENV_HELM_ARGS} . | argocd-vault-plugin generate -"]
+    - name: argocd-vault-plugin-kustomize
+      generate:
+        command: ["sh", "-c"]
+        args: ["kustomize build . | argocd-vault-plugin generate -"]
   resource.exclusions: |
     - apiGroups:
       - cilium.io
