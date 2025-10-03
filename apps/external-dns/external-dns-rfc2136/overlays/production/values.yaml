@@ -19,7 +19,7 @@ domainFilters:
 extraArgs:
   - --rfc2136-host=172.16.0.53
   - --rfc2136-port=53
-  - --rfc2136-zone=apps.lab.mxe11.nl
+  - --rfc2136-zone=lab.mxe11.nl  # Parent zone in Technitium
   - --rfc2136-insecure  # Remove this if using TSIG authentication
   - --rfc2136-min-ttl=60s
   # Uncomment below if using TSIG authentication:
