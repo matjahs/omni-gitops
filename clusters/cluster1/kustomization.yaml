@@ -8,6 +8,7 @@ resources:
   - base/sync-project.yaml
   - base/root-applications.yaml
   - https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/ha/install.yaml
+  - https://raw.githubusercontent.com/argoproj-labs/argocd-image-updater/v0.17.0/manifests/install.yaml
 components: [https://github.com/argoproj-labs/argocd-extensions/manifests]
 patches:
   - path: overlays/production/argocd-cm.yaml
@@ -47,3 +48,5 @@ images:
   - name: quay.io/argoproj/argocd
     newName: quay.io/argoproj/argocd
     newTag: v2.13.3
+  - name: argoprojlabs/argocd-image-updater
+    newTag: v0.17.0
