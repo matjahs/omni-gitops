@@ -6,7 +6,7 @@
 repos:
   # General file checks
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v6.0.0
     hooks:
       - id: trailing-whitespace
         exclude: ^(.*\.patch|.*\.diff)$
@@ -27,13 +27,13 @@ repos:
 
   # YAML formatting
   - repo: https://github.com/lyz-code/yamlfix/
-    rev: main
+    rev: 1.18.0
     hooks:
       - id: yamlfix
 
   # YAML linting
   - repo: https://github.com/adrienverge/yamllint
-    rev: v1.35.1
+    rev: v1.37.1
     hooks:
       - id: yamllint
         args: [-d, '{extends: relaxed, rules: {line-length: {max: 120}}}']
@@ -45,7 +45,7 @@ repos:
 
   # Kubernetes manifest validation
   - repo: https://github.com/Agilicus/pre-commit-hook-k8svalidate.git
-    rev: v0.0.8
+    rev: v0.2.0
     hooks:
       - id: k8svalidate
         args: [--exclude, '**/*.patch.yaml']
@@ -53,7 +53,7 @@ repos:
 
   # Shell script validation
   - repo: https://github.com/shellcheck-py/shellcheck-py
-    rev: v0.10.0.1
+    rev: v0.11.0.1
     hooks:
       - id: shellcheck
         args: [-x]
@@ -80,7 +80,7 @@ repos:
 
   # Kubernetes schema validation with kubeconform
   - repo: https://github.com/compilerla/conventional-pre-commit
-    rev: v3.4.0
+    rev: v4.2.0
     hooks:
       - id: conventional-pre-commit
         stages: [commit-msg]
