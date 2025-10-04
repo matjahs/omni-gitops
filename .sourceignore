@@ -1,0 +1,38 @@
+# Flux source ignore patterns
+# Exclude non-Kubernetes YAML files from Flux Kustomization builds
+
+# Pre-commit configuration
+.pre-commit-config.yaml
+
+# Development and tooling files
+.secrets.baseline
+Taskfile.yml
+TODO.md
+AGENTS.md
+README.md
+journal.log
+
+# Git and IDE files
+.git/
+.github/
+.idea/
+.vscode/
+.cache/
+
+# Docker and temporary files
+.dockerconfigjson
+.DS_Store
+
+# Scripts and templates (not Kubernetes manifests)
+scripts/
+templates/
+.taskfiles/
+
+# Terraform
+terraform/
+
+# Documentation
+docs/
+
+# Omni-specific
+omni/
