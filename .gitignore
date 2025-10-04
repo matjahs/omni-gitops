@@ -43,3 +43,4 @@ splunk/deployment-apps/forwarder_outputs/metadata/local.meta
 .taskfiles/talos/upgrade.yaml
 .taskfiles/tools/precommit.yaml
 Taskfile.yml
+.cache/
