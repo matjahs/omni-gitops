@@ -17,7 +17,7 @@ env:
   # Override the Kubernetes service-injected value so the RFC2136 port flag sees a plain integer.
   - name: EXTERNAL_DNS_RFC2136_PORT
     value: '53'
-  - name: RFC2136_TSIG_SECRET
+  - name: EXTERNAL_DNS_RFC2136_TSIG_SECRET
     valueFrom:
       secretKeyRef:
         name: rfc2136-tsig-secret
