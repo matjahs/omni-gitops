@@ -36,3 +36,8 @@ docs/
 
 # Omni-specific
 omni/
+
+# Helm values files (not Kubernetes manifests)
+# These should be referenced by HelmRelease resources, not processed directly
+**/values.yaml
+**/values-*.yaml
