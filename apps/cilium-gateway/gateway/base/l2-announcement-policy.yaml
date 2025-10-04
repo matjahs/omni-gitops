@@ -21,5 +21,6 @@ spec:
 
   # Service selector - match services created by Gateway API
   serviceSelector:
-    matchLabels:
-      io.cilium/gateway-owning-gateway: 'true'
+    matchExpressions:
+      - key: io.cilium.gateway/owning-gateway
+        operator: Exists

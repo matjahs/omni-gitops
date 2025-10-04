@@ -5,9 +5,8 @@ metadata:
   name: cilium-web-gateway
   namespace: cilium-gateway-system
   annotations:
-    # L2 announcements will be handled by CiliumL2AnnouncementPolicy
-    io.cilium/lb-ipam-ips: 172.16.20.208
-    # Initially no external-dns - we'll add after migration
+    # Cilium L2-IPAM will automatically assign IP from cilium-gateway-pool
+    # IP will be allocated from 172.16.20.208/28 range
     # external-dns.alpha.kubernetes.io/hostname: "*.apps.lab.mxe11.nl"
 spec:
   gatewayClassName: cilium
