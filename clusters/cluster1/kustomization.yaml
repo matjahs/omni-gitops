@@ -50,7 +50,7 @@ patchesJson6902:
 #     kind: StatefulSet
 images:
   - name: quay.io/argoproj/argocd
-    newName: quay.io/argoproj/argocd
-    newTag: v2.13.3
+    newName: ghcr.io/flux-subsystem-argo/fsa/argocd
+    newTag: v2.10.2-fl.23-main-d2c9a8cb
   - name: argoprojlabs/argocd-image-updater
     newTag: v0.17.0

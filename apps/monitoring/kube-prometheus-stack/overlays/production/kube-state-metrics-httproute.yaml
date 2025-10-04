@@ -1,0 +1,17 @@
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: kube-state-metrics
+  namespace: monitoring
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: kube-state-metrics.apps.lab.mxe11.nl
+spec:
+  parentRefs:
+    - name: cilium-secure-gateway
+      namespace: cilium-gateway-system
+  hostnames: [kube-state-metrics.apps.lab.mxe11.nl]
+  rules:
+    - backendRefs:
+        - name: kube-prometheus-stack-kube-state-metrics
+          port: 8080

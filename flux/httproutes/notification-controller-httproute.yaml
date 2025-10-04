@@ -1,0 +1,17 @@
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: flux-notification-controller
+  namespace: flux-system
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: flux-notifications.apps.lab.mxe11.nl
+spec:
+  parentRefs:
+    - name: cilium-secure-gateway
+      namespace: cilium-gateway-system
+  hostnames: [flux-notifications.apps.lab.mxe11.nl]
+  rules:
+    - backendRefs:
+        - name: notification-controller
+          port: 80

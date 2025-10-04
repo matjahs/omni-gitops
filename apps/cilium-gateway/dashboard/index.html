@@ -281,10 +281,16 @@
         const routes = [
             { hostname: 'cd.apps.lab.mxe11.nl', service: 'argocd-server', namespace: 'argocd', gateway: 'cilium-secure-gateway' },
             { hostname: 'hubble.apps.lab.mxe11.nl', service: 'hubble-ui', namespace: 'kube-system', gateway: 'cilium-secure-gateway' },
+            { hostname: 'hubble-relay.apps.lab.mxe11.nl', service: 'hubble-relay', namespace: 'kube-system', gateway: 'cilium-secure-gateway' },
             { hostname: 'grafana.apps.lab.mxe11.nl', service: 'kube-prometheus-stack-grafana', namespace: 'monitoring', gateway: 'cilium-secure-gateway' },
             { hostname: 'prometheus.apps.lab.mxe11.nl', service: 'kube-prometheus-stack-prometheus', namespace: 'monitoring', gateway: 'cilium-secure-gateway' },
+            { hostname: 'alertmanager.apps.lab.mxe11.nl', service: 'kube-prometheus-stack-alertmanager', namespace: 'monitoring', gateway: 'cilium-secure-gateway' },
+            { hostname: 'kube-state-metrics.apps.lab.mxe11.nl', service: 'kube-prometheus-stack-kube-state-metrics', namespace: 'monitoring', gateway: 'cilium-secure-gateway' },
             { hostname: 'uptime.apps.lab.mxe11.nl', service: 'uptime-kuma', namespace: 'monitoring', gateway: 'cilium-secure-gateway' },
-            { hostname: 'ceph.apps.lab.mxe11.nl', service: 'rook-ceph-mgr-dashboard', namespace: 'rook-ceph', gateway: 'cilium-secure-gateway' }
+            { hostname: 'ceph.apps.lab.mxe11.nl', service: 'rook-ceph-mgr-dashboard', namespace: 'rook-ceph', gateway: 'cilium-secure-gateway' },
+            { hostname: 'flux-source.apps.lab.mxe11.nl', service: 'source-controller', namespace: 'flux-system', gateway: 'cilium-secure-gateway' },
+            { hostname: 'flux-notifications.apps.lab.mxe11.nl', service: 'notification-controller', namespace: 'flux-system', gateway: 'cilium-secure-gateway' },
+            { hostname: 'vault.apps.lab.mxe11.nl', service: 'external-vault', namespace: 'default', gateway: 'cilium-secure-gateway' }
         ];
 
         const gateways = [
