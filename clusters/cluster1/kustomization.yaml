@@ -31,6 +31,10 @@ patches:
     target:
       kind: Service
       name: argocd-server
+  - path: overlays/production/argocd-redis-service.yaml
+    target:
+      kind: Service
+      name: argocd-redis
 patchesJson6902:
   - target:
       group: apps
