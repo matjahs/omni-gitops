@@ -1,3 +1,4 @@
+---
 apiVersion: ceph.rook.io/v1
 kind: CephBlockPool
 metadata:
@@ -14,19 +15,20 @@ kind: StorageClass
 metadata:
   name: rook-ceph-block
   annotations:
-    storageclass.kubernetes.io/is-default-class: "true"
-    rook.io/description: "Rook Ceph Block Storage Class"
+    storageclass.kubernetes.io/is-default-class: 'true'
+    rook.io/description: Rook Ceph Block Storage Class
 provisioner: rook-ceph.rbd.csi.ceph.com
 parameters:
   clusterID: rook-ceph
   pool: replicapool
-  imageFormat: "2"
+  imageFormat: '2'
   imageFeatures: layering
   csi.storage.k8s.io/provisioner-secret-name: rook-csi-rbd-provisioner
   csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
   csi.storage.k8s.io/controller-expand-secret-name: rook-csi-rbd-provisioner
   csi.storage.k8s.io/controller-expand-secret-namespace: rook-ceph
-  csi.storage.k8s.io/node-stage-secret-name: rook-csi-rbd-node
+  # Node stage secret is managed via Vault integration
+  # See External Secrets Operator or CSI driver Vault documentation for setup
   csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
   csi.storage.k8s.io/fstype: ext4
 allowVolumeExpansion: true
