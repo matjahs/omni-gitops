@@ -41,3 +41,8 @@ omni/
 # These should be referenced by HelmRelease resources, not processed directly
 **/values.yaml
 **/values-*.yaml
+
+# ArgoCD-managed resources (not for Flux to process directly)
+# Flux bootstraps ArgoCD, then ArgoCD manages these
+apps/
+applications/
