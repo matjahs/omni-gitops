@@ -14,7 +14,6 @@ resources:
   - metallb.yaml
   - monitoring.yaml
   - rook-ceph.yaml
-  - traefik.yaml
   - uptime-kuma.yaml
 commonAnnotations:
   argocd.argoproj.io/sync-wave: '0'
