@@ -5,6 +5,8 @@ metadata:
   name: cilium-secure-gateway
   namespace: cilium-gateway-system
   annotations:
+    # L2 announcements will be handled by CiliumL2AnnouncementPolicy
+    io.cilium/lb-ipam-ips: 172.16.20.209
     # Cert-manager will use the existing wildcard certificate
     cert-manager.io/cluster-issuer: cloudflare-dns-issuer
     # Initially no external-dns - we'll add after migration

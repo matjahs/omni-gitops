@@ -1,0 +1,66 @@
+---
+# Example HTTPRoute for Cilium Gateway API with L2-IPAM
+# This file demonstrates how to create ingress routes using Cilium Gateway
+
+# HTTPS Route (recommended for production)
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: example-app-https
+  namespace: default  # Your application namespace
+spec:
+  # Reference the HTTPS gateway
+  parentRefs:
+    - name: cilium-secure-gateway
+      namespace: cilium-gateway-system
+      sectionName: https  # Optional: specify the listener
+
+  # Hostname for your application
+  hostnames: [myapp.apps.lab.mxe11.nl]
+  rules:
+    # Basic routing to a service
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: myapp-service  # Your Kubernetes service name
+          port: 8080  # Service port
+          weight: 100  # Traffic weight (for canary deployments)
+
+    # Path-based routing example
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /api
+      backendRefs:
+        - name: myapp-api-service
+          port: 8081
+
+    # Header-based routing example
+    - matches:
+        - headers:
+            - name: x-api-version
+              value: v2
+      backendRefs:
+        - name: myapp-service-v2
+          port: 8080
+---
+# HTTP Route (for redirects or non-sensitive apps)
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: example-app-http
+  namespace: default
+spec:
+  parentRefs:
+    - name: cilium-web-gateway
+      namespace: cilium-gateway-system
+  hostnames: [myapp.apps.lab.mxe11.nl]
+  rules:
+    # Redirect all HTTP traffic to HTTPS
+    - filters:
+        - type: RequestRedirect
+          requestRedirect:
+            scheme: https
+            statusCode: 301

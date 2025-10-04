@@ -1,0 +1,25 @@
+---
+apiVersion: cilium.io/v2alpha1
+kind: CiliumL2AnnouncementPolicy
+metadata:
+  name: default-l2-policy
+spec:
+  # Announce IPs from the default-pool
+  loadBalancerIPs: true
+
+  # Allow all nodes to participate in L2 announcements
+  # This provides redundancy - if one node fails, another takes over
+  nodeSelector:
+    matchLabels:
+      kubernetes.io/os: linux
+
+  # Which network interfaces to use for L2 announcements
+  # Typically your main network interface (eth0, ens18, etc.)
+  interfaces:
+    - ^eth[0-9]+
+    - ^ens[0-9]+
+
+  # Service selector - match services created by Gateway API
+  serviceSelector:
+    matchLabels:
+      io.cilium/gateway-owning-gateway: 'true'

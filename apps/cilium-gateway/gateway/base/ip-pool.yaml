@@ -1,0 +1,11 @@
+---
+apiVersion: cilium.io/v2alpha1
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: default-pool
+spec:
+  blocks:
+    - cidr: 172.16.20.208/28
+  serviceSelector:
+    matchLabels:
+      io.cilium/gateway-owning-gateway: 'true'  # Match Gateway-owned services
