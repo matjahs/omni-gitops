@@ -1,0 +1,11 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: grafana-dashboard-cilium-gateway
+  namespace: monitoring
+  labels:
+    grafana_dashboard: '1'
+data:
+  cilium-gateway-api.json: |-
+    <!-- Dashboard JSON will be generated from file -->

@@ -1,0 +1,17 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-dashboard
+  namespace: cilium-gateway-system
+  labels:
+    app: gateway-dashboard
+spec:
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: http
+      protocol: TCP
+      name: http
+  selector:
+    app: gateway-dashboard

@@ -8,3 +8,4 @@ resources:
   - cilium-web-gateway.yaml
   - cilium-secure-gateway.yaml
   - reference-grant.yaml
+  - ../../dashboard
