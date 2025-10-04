@@ -46,3 +46,7 @@ omni/
 # Flux bootstraps ArgoCD, then ArgoCD manages these
 apps/
 applications/
+
+# Cluster-specific configurations
+# These are used for initial ArgoCD deployment, not for Flux reconciliation
+clusters/
