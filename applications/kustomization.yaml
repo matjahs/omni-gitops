@@ -12,7 +12,6 @@ resources:
   - external-secrets-config.yaml
   - hubble-ui.yaml
   - monitoring.yaml
-  - rook-ceph.yaml
   - uptime-kuma.yaml
 commonAnnotations:
   argocd.argoproj.io/sync-wave: '0'

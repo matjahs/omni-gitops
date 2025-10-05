@@ -105,17 +105,6 @@ Base domain: `*.apps.lab.mxe11.nl`
 
 ---
 
-## Storage
-
-### Rook-Ceph Dashboard
-- **URL**: https://ceph.apps.lab.mxe11.nl
-- **Service**: `rook-ceph-mgr-dashboard` (namespace: `rook-ceph`)
-- **Port**: 8443
-- **Purpose**: Ceph storage cluster management dashboard
-- **File**: `apps/rook-ceph/overlays/production/httproute.yaml`
-
----
-
 ## Gateway Dashboard
 
 ### Cilium Gateway Status Dashboard

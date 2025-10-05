@@ -340,30 +340,6 @@ spec:
 
 **Delete old**: `apps/kube-system/hubble-ui/base/hubble-ui-ingressroute.yaml`
 
-#### 2.4 Migrate Ceph Dashboard
-
-File: `apps/rook-ceph/dashboard/base/dashboard-httproute.yaml`
-
-```yaml
-apiVersion: gateway.networking.k8s.io/v1
-kind: HTTPRoute
-metadata:
-  name: ceph-dashboard
-  namespace: rook-ceph
-  annotations:
-    external-dns.alpha.kubernetes.io/hostname: ceph.apps.lab.mxe11.nl
-spec:
-  parentRefs:
-    - name: cilium-secure-gateway
-      namespace: cilium-gateway-system
-  hostnames:
-    - ceph.apps.lab.mxe11.nl
-  rules:
-    - backendRefs:
-        - name: rook-ceph-mgr-dashboard
-          port: 7000
-```
-
 #### 2.5 Migrate Grafana
 
 File: `apps/monitoring/kube-prometheus-stack/overlays/production/grafana-httproute.yaml`

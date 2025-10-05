@@ -1,10 +1,9 @@
+---
 # Production-specific values for Uptime Kuma
-
 uptime-kuma:
   # Add production-specific configuration here
-
   volume:
     enabled: true
     accessMode: ReadWriteOnce
     size: 4Gi
-    storageClassName: "rook-ceph-block"
+    storageClassName:  # TODO
