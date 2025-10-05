@@ -27,6 +27,18 @@ spec:
       name: client-info-secret
       create: false
     storageClasses:
+      iscsi-delete:
+        disabled: true
+      iscsi-retain:
+        disabled: true
+      nfs-delete:
+        disabled: true
+      nfs-retain:
+        disabled: true
+      smb-delete:
+        disabled: true
+      smb-retain:
+        disabled: true
       synology-iscsi-storage:
         reclaimPolicy: Delete
         volumeBindingMode: Immediate
@@ -35,5 +47,9 @@ spec:
           dsm: 172.16.0.189
           location: /volume1
     volumeSnapshotClasses:
+      delete:
+        disabled: true
+      retain:
+        disabled: true
       synology-snapshotclass:
         deletionPolicy: Delete
