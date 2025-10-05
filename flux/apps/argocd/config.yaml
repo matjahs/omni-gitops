@@ -5,7 +5,7 @@ metadata:
   name: argocd-values
   namespace: argocd
 data:
-  values.yaml: |-
+  values.yaml: |-  # pragma: allowlist secret
     # ArgoCD Helm Chart Values - Migrated from clusters/cluster1
     # https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd
     global:
@@ -21,6 +21,12 @@ data:
     redis:
       enabled: false
 
+    # Config Parameters - these go into argocd-cmd-params-cm
+    configs:
+      params:
+        # Run server without TLS (TLS termination at Cilium Gateway)
+        server.insecure: true
+
     # Controller configuration
     controller:
       replicas: 1
@@ -28,8 +34,6 @@ data:
     # Server configuration
     server:
       replicas: 2
-      # Run in insecure mode (TLS termination at ingress)
-      insecure: true
       service:
         type: ClusterIP
 
