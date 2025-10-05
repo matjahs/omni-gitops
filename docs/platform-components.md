@@ -2,7 +2,7 @@
 
 ## Overview
 
-The platform consists of four core components managed by ArgoCD in a GitOps pattern. Each component is defined in the `applications/` directory and automatically deployed and maintained.
+The platform consists of five core components managed in a GitOps pattern. Each component is defined in the repository and automatically deployed and maintained.
 
 ## ArgoCD (GitOps Engine)
 
@@ -174,6 +174,84 @@ kubectl get ipaddresspool -n metallb-system
 kubectl get l2advertisement -n metallb-system
 ```
 
+## Synology CSI (Persistent Storage)
+
+**Purpose:** Network-attached persistent volumes backed by the Synology NAS
+**Namespace:** `synology-csi`
+**Repository:** `flux/releases/synology-csi.yaml`
+
+### Features
+- **NAS Integration:** Uses the official Synology CSI driver (`csi.san.synology.com`)
+- **Secret Management:** Credentials sourced from Vault via ExternalSecret
+- **Snapshot Support:** Installs a default VolumeSnapshotClass (deletion policy `Delete`)
+- **Single Storage Class:** Provides `synology-csi-synology-csi-synology-iscsi-storage` for iSCSI-backed PVCs
+
+### Configuration Highlights
+```yaml
+# Helm values (excerpt)
+clientInfoSecret:
+  name: client-info-secret
+  create: false
+storageClasses:
+  synology-iscsi-storage:
+    reclaimPolicy: Delete
+    volumeBindingMode: Immediate
+    parameters:
+      fsType: ext4
+      dsm: "172.16.0.189"
+      location: "/volume1"
+
+# Vault-backed client info
+apiVersion: external-secrets.io/v1beta1
+kind: ExternalSecret
+spec:
+  target:
+    name: client-info-secret
+    template:
+      data:
+        client-info.yaml: |
+          clients:
+            - host: {{ .host }}
+              port: 5000
+              https: false
+              username: {{ .username }}
+              password: {{ .password }}
+```
+
+### Usage Examples
+```bash
+# Create a PersistentVolumeClaim
+cat <<'EOF' | kubectl apply -f -
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: demo-synology-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: synology-csi-synology-csi-synology-iscsi-storage
+EOF
+
+# Inspect created volumes
+kubectl get pvc,pv
+```
+
+### Monitoring
+```bash
+# Check driver pods
+kubectl get pods -n synology-csi
+
+# Inspect StorageClass and VolumeSnapshotClass
+kubectl get storageclass synology-csi-synology-csi-synology-iscsi-storage
+kubectl get volumesnapshotclass synology-csi-synology-csi-synology-snapshotclass
+
+# Validate secret sync
+kubectl get secret client-info-secret -n synology-csi -o yaml
+```
+
 ## Metrics Server (Resource Metrics)
 
 **Purpose:** Container and node resource metrics for HPA and kubectl top
@@ -270,22 +348,28 @@ kubectl get apiservice v1beta1.metrics.k8s.io
 ### Startup Order
 1. **Kubernetes Cluster** (Talos + Cilium)
 2. **MetalLB** (for LoadBalancer services)
-3. **Traefik** (depends on MetalLB for external access)
-4. **ArgoCD** (manages all components)
-5. **Metrics Server** (independent, can start anytime)
+3. **Synology CSI** (requires the cluster but independent of networking stack)
+4. **Traefik** (depends on MetalLB for external access)
+5. **ArgoCD** (manages all components)
+6. **Metrics Server** (independent, can start anytime)
 
 ### Service Dependencies
 ```mermaid
 graph TD
     A[Talos Cluster] --> B[Cilium CNI]
     B --> C[MetalLB]
-    C --> D[Traefik]
-    D --> E[ArgoCD]
-    E --> F[Applications]
-    B --> G[Metrics Server]
+    C --> D[Synology CSI]
+    D --> E[Traefik]
+    E --> F[ArgoCD]
+    F --> G[Applications]
+    B --> H[Metrics Server]
 ```
 
 ### Resource Requirements
-| Component | CPU Request | Memory Request | Replicas |
-|-----------|-------------|----------------|----------|
-| ArgoCD | 250m | 256
+| Component      | CPU Request | Memory Request | Workload Pattern          |
+|----------------|-------------|----------------|---------------------------|
+| ArgoCD         | 250m        | 256Mi          | Deployment (3 replicas)   |
+| Traefik        | 200m        | 256Mi          | Deployment (2 replicas)   |
+| MetalLB        | 100m        | 128Mi          | Controller + DaemonSet    |
+| Synology CSI   | 250m        | 256Mi          | StatefulSet + DaemonSet   |
+| Metrics Server | 100m        | 200Mi          | Deployment (1 replica)    |
