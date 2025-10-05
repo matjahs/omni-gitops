@@ -43,12 +43,13 @@ omni/
 **/values-*.yaml
 
 # ⚠️ ArgoCD-managed resources - DO NOT DEPLOY WITH FLUX ⚠️
-# Flux bootstraps ArgoCD, then ArgoCD exclusively manages these directories
+# ArgoCD exclusively manages the root apps/ and applications/ directories
 # This prevents reconciliation loops and deployment conflicts between the two GitOps tools
-apps/
-apps/**
-applications/
-applications/**
+# Note: flux/apps/ is managed by Flux and should NOT be excluded
+/apps/
+/apps/**
+/applications/
+/applications/**
 
 # Cluster-specific configurations
 # These are used for initial ArgoCD deployment, not for Flux reconciliation
