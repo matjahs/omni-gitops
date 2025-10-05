@@ -1,0 +1,29 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: external-snapshotter
+  namespace: flux-system
+spec:
+  interval: 24h
+  url: https://github.com/kubernetes-csi/external-snapshotter
+  ref:
+    tag: v8.2.0
+  ignore: |
+    /*
+    !/client/config/crd
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: snapshot-crds
+  namespace: flux-system
+spec:
+  interval: 1h
+  prune: false  # Don't auto-delete CRDs
+  sourceRef:
+    kind: GitRepository
+    name: external-snapshotter
+  path: ./client/config/crd
+  wait: true
+  timeout: 2m

@@ -4,6 +4,7 @@ kind: Kustomization
 resources:
   - flux-apps.yaml
   - resources/cluster-secret-store.yaml
+  - resources/snapshot-crds.yaml
   - resources/democratic-csi-namespace.yaml
   - resources/democratic-csi-external-secret.yaml
   - sources/external-dns.yaml
