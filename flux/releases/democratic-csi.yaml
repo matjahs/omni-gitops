@@ -24,9 +24,8 @@ spec:
       retries: 3
   valuesFrom:
     - kind: Secret
-      name: democratic-csi-synology
-      valuesKey: driver-config-file.yaml
-      targetPath: driver-config-file.yaml
+      name: democratic-csi-driver-config
+      valuesKey: values.yaml
   values:
     csiDriver:
       name: org.democratic-csi.iscsi
