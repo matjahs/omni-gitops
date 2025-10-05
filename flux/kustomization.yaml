@@ -5,12 +5,12 @@ resources:
   - flux-apps.yaml
   - resources/cluster-secret-store.yaml
   - resources/snapshot-crds.yaml
-  - resources/democratic-csi-namespace.yaml
-  - resources/democratic-csi-external-secret.yaml
+  - resources/synology-csi-namespace.yaml
+  - resources/synology-csi-external-secret.yaml
   - sources/external-dns.yaml
   - sources/local-path-provisioner.yaml
-  - sources/democratic-csi.yaml
+  - sources/synology-csi.yaml
   - configs/external-dns-rfc2136.yaml
   - releases/external-dns-rfc2136.yaml
   - releases/local-path-provisioner.yaml
-  - releases/democratic-csi.yaml
+  - releases/synology-csi.yaml
