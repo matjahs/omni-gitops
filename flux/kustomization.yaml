@@ -4,8 +4,12 @@ kind: Kustomization
 resources:
   - flux-apps.yaml
   - resources/cluster-secret-store.yaml
+  - resources/democratic-csi-namespace.yaml
+  - resources/democratic-csi-external-secret.yaml
   - sources/external-dns.yaml
   - sources/local-path-provisioner.yaml
+  - sources/democratic-csi.yaml
   - configs/external-dns-rfc2136.yaml
   - releases/external-dns-rfc2136.yaml
   - releases/local-path-provisioner.yaml
+  - releases/democratic-csi.yaml

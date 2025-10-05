@@ -31,7 +31,7 @@ This guide configures Synology DS723+ as an iSCSI storage backend for Kubernetes
    - **IQN**: `iqn.2000-01.com.synology:kubernetes-storage` (auto-generated)
    - **CHAP Authentication**:
      - Check **Enable CHAP**
-     - Username: `k8s-admin` (choose your own)
+     - Username: `k8sadmin` (choose your own)
      - Password: (secure password, min 12 characters)
    - **Mutual CHAP**: Leave disabled for simplicity
 5. Click **Next** → **Apply**
@@ -103,7 +103,7 @@ stringData:
     <paste your private key content here>
     -----END OPENSSH PRIVATE KEY-----
   # iSCSI CHAP credentials
-  chap-username: k8s-admin
+  chap-username: k8sadmin
   chap-password: <your-chap-password>
 ```
 
@@ -116,7 +116,7 @@ Gather these details from your Synology:
 - **Synology IP**: `<synology-ip>`
 - **iSCSI Target IQN**: `iqn.2000-01.com.synology:kubernetes-storage`
 - **SSH Username**: `admin`
-- **CHAP Username**: `k8s-admin`
+- **CHAP Username**: `k8sadmin`
 - **Volume Path**: `/volume1` (or your configured volume)
 - **LUN Base Path**: `/volume1/k8s-dynamic-storage`
 

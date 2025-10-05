@@ -44,3 +44,4 @@ splunk/deployment-apps/forwarder_outputs/metadata/local.meta
 .taskfiles/tools/precommit.yaml
 Taskfile.yml
 .cache/
+.cache_ggshield
