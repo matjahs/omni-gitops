@@ -1,0 +1,6 @@
+⚠️  FLUX CD ONLY - DO NOT DEPLOY WITH ARGOCD ⚠️
+
+This directory is managed exclusively by Flux CD.
+ArgoCD should never deploy resources from this directory.
+
+See .argocdignore in the repository root.

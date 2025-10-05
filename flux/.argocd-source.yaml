@@ -1,0 +1,10 @@
+---
+# ArgoCD source exclusion
+# This file prevents ArgoCD from discovering or deploying resources from this directory
+# The flux/ directory is managed exclusively by Flux CD
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: excluded
+spec:
+  generators: []

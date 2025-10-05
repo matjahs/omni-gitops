@@ -1,0 +1,15 @@
+⚠️  ARGOCD ONLY - DO NOT DEPLOY WITH FLUX ⚠️
+
+This directory contains ArgoCD Application definitions.
+Flux CD should never deploy resources from this directory.
+
+See .sourceignore in the repository root.
+
+Protection mechanisms:
+- .sourceignore excludes applications/ and applications/**
+- ArgoCD App-of-Apps pattern manages these Applications
+- Flux Kustomizations use path: ./flux
+
+For more information:
+- Flux resources: /flux/README.md
+- ArgoCD Application definitions: This directory

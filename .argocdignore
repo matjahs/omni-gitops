@@ -1,0 +1,26 @@
+# ArgoCD Ignore Patterns
+# Prevent ArgoCD from discovering or syncing these paths
+# See: https://argo-cd.readthedocs.io/en/stable/user-guide/compare-options/#ignoring-resources
+
+# Flux CD managed directory - DO NOT DEPLOY WITH ARGOCD
+flux/
+flux/**
+
+# Documentation
+*.md
+!README.md
+
+# Git metadata
+.git/
+.github/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
