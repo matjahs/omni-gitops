@@ -38,6 +38,7 @@ spec:
   parentRefs:
     - name: cilium-secure-gateway
       namespace: cilium-gateway-system
+      sectionName: https
   hostnames: [cd.apps.lab.mxe11.nl]
   rules:
     - matches:

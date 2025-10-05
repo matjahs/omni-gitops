@@ -46,3 +46,4 @@ Taskfile.yml
 .cache/
 .cache_ggshield
 client-info.yaml
+csi-vsphere.conf
