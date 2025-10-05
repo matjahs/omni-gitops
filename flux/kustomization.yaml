@@ -5,5 +5,7 @@ resources:
   - flux-apps.yaml
   - resources/cluster-secret-store.yaml
   - sources/external-dns.yaml
+  - sources/local-path-provisioner.yaml
   - configs/external-dns-rfc2136.yaml
   - releases/external-dns-rfc2136.yaml
+  - releases/local-path-provisioner.yaml
