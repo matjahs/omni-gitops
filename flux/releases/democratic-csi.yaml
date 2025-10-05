@@ -37,6 +37,7 @@ spec:
         allowVolumeExpansion: true
         parameters:
           fsType: ext4
+          type: FILE
         mountOptions: []
         secrets:
           provisioner-secret:
