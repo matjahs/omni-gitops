@@ -10,6 +10,7 @@ spec:
   parentRefs:
     - name: cilium-secure-gateway
       namespace: cilium-gateway-system
+      sectionName: https
   hostnames: [hubble-relay.apps.lab.mxe11.nl]
   rules:
     - backendRefs:

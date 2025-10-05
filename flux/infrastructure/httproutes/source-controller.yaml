@@ -10,6 +10,7 @@ spec:
   parentRefs:
     - name: cilium-secure-gateway
       namespace: cilium-gateway-system
+      sectionName: https
   hostnames: [flux-source.apps.lab.mxe11.nl]
   rules:
     - backendRefs:
