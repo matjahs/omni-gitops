@@ -8,7 +8,7 @@ prometheus:
     storageSpec:
       volumeClaimTemplate:
         spec:
-          storageClassName:  # TODO
+          storageClassName: default
           accessModes: [ReadWriteOnce]
           resources:
             requests:
@@ -26,7 +26,7 @@ grafana:
   adminPassword: admin  # pragma: allowlist secret
   persistence:
     enabled: true
-    storageClassName:  # TODO
+    storageClassName: default
     size: 10Gi
   resources:
     requests:
@@ -42,7 +42,7 @@ alertmanager:
     storage:
       volumeClaimTemplate:
         spec:
-          storageClassName:  # TODO
+          storageClassName: default
           accessModes: [ReadWriteOnce]
           resources:
             requests:
