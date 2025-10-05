@@ -25,6 +25,7 @@ spec:
   valuesFrom:
     - kind: Secret
       name: democratic-csi-synology
+      namespace: democratic-csi
       valuesKey: driver-config-file.yaml
       targetPath: driver-config-file.yaml
   values:
