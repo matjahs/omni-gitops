@@ -28,12 +28,14 @@ usage() {
 Bootstrap Omni GitOps Platform
 
 This script will:
-1. Install ArgoCD in the cluster
-2. Deploy platform applications (Traefik, MetalLB, Metrics Server)
-3. Set up GitOps automation
+1. Verify Flux CD is installed and bootstrapped
+2. Reconcile Flux to deploy ArgoCD and infrastructure
+3. Deploy ArgoCD Applications for platform services
+4. Set up GitOps automation
 
 Prerequisites:
 - kubectl configured for target cluster
+- Flux CD installed and bootstrapped (see: flux bootstrap)
 - Cluster with Talos OS + Cilium CNI
 - Internet connectivity for image pulls
 
@@ -49,6 +51,9 @@ Examples:
   $0                  # Bootstrap with default settings
   $0 --debug          # Bootstrap with debug output
   $0 --skip-wait      # Quick bootstrap without waiting
+
+NOTE: ArgoCD is now deployed by Flux. This script assumes Flux is already installed.
+      For new clusters, run: flux bootstrap github --owner=matjahs --repository=omni-gitops
 
 EOF
   exit 0
@@ -91,6 +96,7 @@ fi
 # Configuration
 REPO_URL="https://github.com/matjahs/omni-gitops.git"
 ARGOCD_NAMESPACE="argocd"
+FLUX_NAMESPACE="flux-system"
 TIMEOUT=300
 
 log "Starting Omni GitOps Platform Bootstrap"
@@ -106,12 +112,19 @@ preflight_checks() {
     exit 1
   fi
 
-  # Check if we're in the right directory
-  if [[ ! -f "clusters/cluster1/kustomization.yaml" ]]; then
-    log "clusters/cluster1/kustomization.yaml not found. Are you in the repository root?" error
+  # Check if Flux is installed
+  if ! kubectl get namespace "$FLUX_NAMESPACE" >/dev/null 2>&1; then
+    log "Flux namespace not found. Please bootstrap Flux first:" error
+    log "  flux bootstrap github --owner=matjahs --repository=omni-gitops --path=flux" error
     exit 1
   fi
 
+  if ! kubectl get deployment source-controller -n "$FLUX_NAMESPACE" >/dev/null 2>&1; then
+    log "Flux controllers not found. Please install Flux first." error
+    exit 1
+  fi
+
+  # Check if we're in the right directory
   if [[ ! -f "applications/kustomization.yaml" ]]; then
     log "applications/kustomization.yaml not found. Are you in the repository root?" error
     exit 1
@@ -130,37 +143,55 @@ preflight_checks() {
   log "Preflight checks passed ✓"
 }
 
-# Install ArgoCD
-install_argocd() {
-  log "Checking ArgoCD installation..."
+# Reconcile Flux to deploy ArgoCD
+reconcile_flux() {
+  log "Checking Flux status..."
 
-  if kubectl get namespace "$ARGOCD_NAMESPACE" >/dev/null 2>&1; then
-    log "ArgoCD namespace already exists, checking deployment status..." warn
+  # Check Flux Kustomizations
+  local flux_ready
+  flux_ready=$(kubectl get kustomization -n "$FLUX_NAMESPACE" flux-system -o jsonpath='{.status.conditions[?(@.type=="Ready")].status}' 2>/dev/null || echo "Unknown")
 
-    if kubectl get deployment argocd-server -n "$ARGOCD_NAMESPACE" >/dev/null 2>&1; then
-      log "ArgoCD server deployment exists, skipping installation"
-      return 0
-    fi
+  if [[ "$flux_ready" != "True" ]]; then
+    log "Flux system kustomization is not ready. Status: $flux_ready" warn
+    log "Attempting to reconcile Flux..." warn
   fi
 
-  log "Installing ArgoCD..."
-  kubectl apply -k clusters/cluster1/
+  log "Reconciling Flux to deploy infrastructure and ArgoCD..."
+  flux reconcile source git flux-system --with-source || true
+  flux reconcile kustomization flux-system --with-source || true
 
   if [[ "$SKIP_WAIT" == "false" ]]; then
-    log "Waiting for ArgoCD server to be ready (timeout: ${TIMEOUT}s)..."
-    if kubectl wait --for=condition=available --timeout="${TIMEOUT}s" deployment/argocd-server -n "$ARGOCD_NAMESPACE"; then
+    log "Waiting for ArgoCD HelmRelease to be ready (timeout: ${TIMEOUT}s)..."
+
+    # Wait for ArgoCD namespace to exist
+    local wait_count=0
+    while ! kubectl get namespace "$ARGOCD_NAMESPACE" >/dev/null 2>&1; do
+      if [[ $wait_count -gt 60 ]]; then
+        log "ArgoCD namespace not created after 60s. Check Flux logs:" error
+        log "  kubectl logs -n $FLUX_NAMESPACE -l app=helm-controller" error
+        exit 1
+      fi
+      sleep 1
+      ((wait_count++))
+    done
+
+    # Wait for ArgoCD server deployment
+    if kubectl wait --for=condition=available --timeout="${TIMEOUT}s" deployment/argocd-server -n "$ARGOCD_NAMESPACE" 2>/dev/null; then
       log "ArgoCD server is ready ✓"
     else
       log "ArgoCD server failed to become ready within ${TIMEOUT}s" error
+      log "Check HelmRelease status: kubectl describe helmrelease argocd -n $ARGOCD_NAMESPACE" error
       log "Check pod status: kubectl get pods -n $ARGOCD_NAMESPACE" error
       exit 1
     fi
   fi
 }
 
-# Deploy platform applications
+# Deploy platform applications via ArgoCD
 deploy_platform() {
   log "Deploying platform applications..."
+
+  # Apply ArgoCD Applications
   kubectl apply -k applications/
 
   log "Waiting for applications to be created..."
@@ -200,6 +231,10 @@ get_access_info() {
   echo "🚀 Bootstrap Complete!"
   echo "===================="
   echo
+  echo "GitOps Architecture:"
+  echo "  Flux CD:     Manages infrastructure (ArgoCD, storage, networking)"
+  echo "  ArgoCD:      Manages platform applications"
+  echo
   echo "ArgoCD Access:"
   echo "  URL (local):  https://localhost:8080"
   echo "  URL (domain): https://cd.apps.lab.mxe11.nl"
@@ -212,15 +247,27 @@ get_access_info() {
   echo "  vCenter:      https://vc.lab.mxe11.nl/ui"
   echo
   echo "Useful Commands:"
+  echo "  # ArgoCD"
   echo "  kubectl get applications -n argocd"
-  echo "  kubectl get pods --all-namespaces"
   echo "  kubectl port-forward svc/argocd-server -n argocd 8080:443"
+  echo
+  echo "  # Flux"
+  echo "  flux get kustomizations"
+  echo "  flux get helmreleases -A"
+  echo "  flux reconcile kustomization flux-apps --with-source"
+  echo
+  echo "  # General"
+  echo "  kubectl get pods --all-namespaces"
   echo
   echo "Next Steps:"
   echo "  1. Access ArgoCD UI and verify applications are syncing"
   echo "  2. Check platform component status"
   echo "  3. Add new applications via GitOps workflow"
   echo "  4. Review documentation in docs/"
+  echo
+  echo "Documentation:"
+  echo "  - Flux/ArgoCD Hybrid: flux/README.md"
+  echo "  - Migration Guide:    docs/ARGOCD_FLUX_MIGRATION.md"
   echo
 }
 
@@ -237,7 +284,7 @@ trap cleanup EXIT INT TERM
 # Main execution
 main() {
   preflight_checks
-  install_argocd
+  reconcile_flux
   deploy_platform
   get_access_info
 }

@@ -1,0 +1,200 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-values
+  namespace: argocd
+data:
+  values.yaml: |-
+    # ArgoCD Helm Chart Values - Migrated from clusters/cluster1
+    # https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd
+    global:
+      domain: cd.apps.lab.mxe11.nl
+
+    # Use HA (High Availability) mode with Redis HA
+    redis-ha:
+      enabled: true
+      haproxy:
+        enabled: true
+
+    # Disable standalone Redis since we're using Redis HA
+    redis:
+      enabled: false
+
+    # Controller configuration
+    controller:
+      replicas: 1
+
+    # Server configuration
+    server:
+      replicas: 2
+      # Run in insecure mode (TLS termination at ingress)
+      insecure: true
+      service:
+        type: ClusterIP
+
+      # Server ConfigMap settings
+      config:
+        exec.enabled: "true"
+        application.resourceTrackingMethod: annotation
+        admin.enabled: "true"
+        statusbadge.enabled: "true"
+        users.anonymous.enabled: "true"
+        url: https://cd.apps.lab.mxe11.nl
+
+        # Resource exclusions (Cilium identities)
+        resource.exclusions: |
+          - apiGroups:
+            - cilium.io
+            kinds:
+            - CiliumIdentity
+            clusters:
+            - "*"
+
+        # Config Management Plugins for Vault and Flux
+        configManagementPlugins: |
+          - name: flux
+            generate:
+              command: [sh, -c]
+              args: ["argocd-flux-plugin . --path $GIT_PATH"]
+          - name: argocd-vault-plugin
+            generate:
+              command: ["argocd-vault-plugin"]
+              args: ["generate", "./"]
+          - name: argocd-vault-plugin-helm
+            init:
+              command: [sh, -c]
+              args: ["helm dependency build"]
+            generate:
+              command: ["sh", "-c"]
+              args: ["helm template $ARGOCD_APP_NAME -n $ARGOCD_APP_NAMESPACE ${ARGOCD_ENV_HELM_ARGS} . | argocd-vault-plugin generate -"]
+          - name: argocd-vault-plugin-kustomize
+            generate:
+              command: ["sh", "-c"]
+              args: ["kustomize build . | argocd-vault-plugin generate -"]
+
+      # RBAC configuration
+      rbacConfig:
+        policy.csv: |
+          g, argoproj:argo-rollouts-approvers, role:admin
+          g, argoproj:argo-workflows-approvers, role:admin
+          g, argoproj:argocd-approvers, role:admin
+        policy.default: role:readonly
+
+    # Repo Server configuration with Vault plugin
+    repoServer:
+      replicas: 2
+
+      # Add argocd-vault-plugin via init container
+      volumes:
+        - name: custom-tools
+          emptyDir: {}
+      volumeMounts:
+        - name: custom-tools
+          mountPath: /usr/local/bin/argocd-vault-plugin
+          subPath: argocd-vault-plugin
+      initContainers:
+        - name: download-tools
+          image: alpine:3.20
+          command: [sh, -c]
+          args:
+            - >-
+              wget -O argocd-vault-plugin
+              https://github.com/argoproj-labs/argocd-vault-plugin/releases/download/v1.18.1/argocd-vault-plugin_1.18.1_linux_amd64 &&
+              chmod +x argocd-vault-plugin &&
+              mv argocd-vault-plugin /custom-tools/
+          volumeMounts:
+            - mountPath: /custom-tools
+              name: custom-tools
+
+      # Environment variables for Vault integration
+      env:
+        - name: AVP_TYPE
+          value: vault
+        - name: AVP_AUTH_TYPE
+          value: k8s
+        - name: AVP_K8S_ROLE
+          value: argocd
+        - name: VAULT_ADDR
+          value: http://172.16.0.4:8200
+        - name: AVP_K8S_MOUNT_PATH
+          value: kubernetes
+        # Redis HA configuration
+        - name: REDIS_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: argocd-redis
+              key: auth
+        - name: ARGOCD_REDIS
+          value: argocd-redis-ha-haproxy:6379
+        - name: ARGOCD_REDIS_ADDR
+          value: argocd-redis-ha-haproxy:6379
+
+    # ApplicationSet controller
+    applicationSet:
+      replicas: 2
+
+    # Notifications controller configuration
+    notifications:
+      enabled: true
+      argocdUrl: https://cd.apps.lab.mxe11.nl
+      notifiers:
+        service.slack: |
+          token: $slack-token
+          signingSecret: $slack-signing-secret
+        service.grafana: |
+          apiUrl: https://grafana.apps.lab.mxe11.nl/api
+          apiKey: $grafana-token
+        service.webhook.github: |
+          url: https://api.github.com
+          headers:
+          - name: Authorization
+            value: token $github-token
+      triggers:
+        trigger.sync-operation-change: |
+          - when: app.status.operationState.phase in ['Succeeded']
+            send: [github-commit-status, app-sync-succeeded]
+          - when: app.status.operationState.phase in ['Running']
+            send: [github-commit-status, app-sync-running]
+          - when: app.status.operationState.phase in ['Error', 'Failed']
+            send: [github-commit-status, app-sync-failed]
+      templates:
+        template.github-commit-status: |
+          description: Generates Github webhook payload
+          webhook:
+            github:
+              method: POST
+              path: /repos/{{call .repo.FullNameByRepoURL .app.spec.source.repoURL}}/statuses/{{.app.status.operationState.operation.sync.revision}}
+              body: |
+                {
+                  {{if eq .app.status.operationState.phase "Running"}} "state": "pending"{{end}}
+                  {{if eq .app.status.operationState.phase "Succeeded"}} "state": "success"{{end}}
+                  {{if eq .app.status.operationState.phase "Error"}} "state": "error"{{end}}
+                  {{if eq .app.status.operationState.phase "Failed"}} "state": "error"{{end}},
+                  "description": "ArgoCD",
+                  "target_url": "{{.context.argocdUrl}}/applications/{{.app.metadata.name}}",
+                  "context": "continuous-delivery/{{.app.metadata.name}}"
+                }
+
+    # Dex (SSO) - currently disabled, uncomment to enable GitHub OAuth
+    dex:
+      enabled: false
+      # config:
+      #   connectors:
+      #     - type: github
+      #       id: github
+      #       name: GitHub
+      #       config:
+      #         clientID: $argocd-oidc-secret:clientID
+      #         clientSecret: $argocd-oidc-secret:clientSecret
+      #         orgs:
+      #         - name: matjahs
+
+    # Argo Rollouts Extension
+    extensions:
+      enabled: true
+      extensionList:
+        - name: argo-rollouts
+          env:
+            - name: EXTENSION_URL
+              value: https://github.com/argoproj-labs/rollout-extension/releases/download/v0.1.0/extension.tar
