@@ -59,13 +59,13 @@ repos:
         args: [-x]
 
   # GitGuardian for secret detection
-  - repo: https://github.com/gitguardian/ggshield
-    rev: v1.43.0
-    hooks:
-      - id: ggshield
-        language_version: python3
-        stages: [pre-commit]
-        args: [scan, pre-commit, --exit-zero]
+  # - repo: https://github.com/gitguardian/ggshield
+  #   rev: v1.43.0
+  #   hooks:
+  #     - id: ggshield
+  #       language_version: python3
+  #       stages: [pre-commit]
+  #       args: [scan, pre-commit, --exit-zero]
 
   # Secret detection
   - repo: https://github.com/Yelp/detect-secrets

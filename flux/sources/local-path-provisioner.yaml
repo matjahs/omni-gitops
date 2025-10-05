@@ -2,7 +2,7 @@
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
-  name: local-path-provisioner
+  name: synology-csi-synology-csi-synology-iscsi-storage-provisioner
   namespace: flux-system
 spec:
   interval: 24h

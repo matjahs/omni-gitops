@@ -9,7 +9,7 @@ image:
 # Persistence
 persistence:
   enabled: true
-  storageClass: local-path
+  storageClass: synology-csi-synology-csi-synology-iscsi-storage
   accessMode: ReadWriteOnce
   size: 4Gi
 # Service configuration
@@ -19,7 +19,7 @@ service:
 # Ingress configuration
 ingress:
   enabled: true
-  className: local-path
+  className: synology-csi-synology-csi-synology-iscsi-storage
   annotations:
     cert-manager.io/cluster-issuer: cloudflare-dns-issuer
   hosts:

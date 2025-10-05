@@ -352,16 +352,16 @@ After successful testing:
 
 1. **Migrate Monitoring Stack** to use democratic-csi:
    - Update monitoring StorageClass to `synology-iscsi`
-   - Delete old local-path PVCs
+   - Delete old synology-csi-synology-csi-synology-iscsi-storage PVCs
    - Let ArgoCD recreate with new storage
 
 2. **Set as Default StorageClass** (optional):
    ```bash
    kubectl patch storageclass synology-iscsi -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
-   kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
+   kubectl patch storageclass synology-csi-synology-csi-synology-iscsi-storage -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"false"}}}'
    ```
 
-3. **Remove local-path-provisioner**:
+3. **Remove synology-csi-synology-csi-synology-iscsi-storage-provisioner**:
    - After all workloads migrated
    - Delete from Flux kustomization
 

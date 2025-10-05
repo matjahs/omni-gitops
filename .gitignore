@@ -45,3 +45,4 @@ splunk/deployment-apps/forwarder_outputs/metadata/local.meta
 Taskfile.yml
 .cache/
 .cache_ggshield
+client-info.yaml

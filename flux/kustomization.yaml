@@ -3,14 +3,14 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
   - flux-apps.yaml
-  - resources/cluster-secret-store.yaml
-  - resources/snapshot-crds.yaml
-  - resources/synology-csi-namespace.yaml
-  - resources/synology-csi-external-secret.yaml
-  - sources/external-dns.yaml
-  - sources/local-path-provisioner.yaml
-  - sources/synology-csi.yaml
   - configs/external-dns-rfc2136.yaml
   - releases/external-dns-rfc2136.yaml
-  - releases/local-path-provisioner.yaml
+  - releases/synology-csi-synology-csi-synology-iscsi-storage-provisioner.yaml
   - releases/synology-csi.yaml
+  - resources/cluster-secret-store.yaml
+  - resources/snapshot-crds.yaml
+  - resources/synology-csi-external-secret.yaml
+  - resources/synology-csi-namespace.yaml
+  - sources/external-dns.yaml
+  - sources/synology-csi-synology-csi-synology-iscsi-storage-provisioner.yaml
+  - sources/synology-csi.yaml

@@ -16,7 +16,7 @@ spec:
         namespace: flux-system
   targetNamespace: synology-csi
   install:
-    createNamespace: false
+    createNamespace: true
     remediation:
       retries: 3
   upgrade:
@@ -25,7 +25,7 @@ spec:
   values:
     clientInfoSecret:
       name: client-info-secret
-      create: false
+      create: true
     storageClasses:
       iscsi-delete:
         disabled: true
@@ -45,7 +45,7 @@ spec:
         parameters:
           fsType: ext4
           dsm: 172.16.0.189
-          location: /volume1
+          location: /volume1/k8s
     volumeSnapshotClasses:
       delete:
         disabled: true
