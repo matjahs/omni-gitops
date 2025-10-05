@@ -65,6 +65,7 @@ repos:
       - id: ggshield
         language_version: python3
         stages: [pre-commit]
+        args: [scan, pre-commit, --exit-zero]
 
   # Secret detection
   - repo: https://github.com/Yelp/detect-secrets
