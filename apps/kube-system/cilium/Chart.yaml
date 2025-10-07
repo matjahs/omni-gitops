@@ -1,0 +1,18 @@
+---
+apiVersion: v2
+name: cilium
+description: A Helm chart for Kubernetes
+type: application
+version: 1.14.5
+appVersion: 1.18.2
+keywords: [networking, cni]
+home: https://cilium.io/
+sources:
+  - https://github.com/cilium/cilium
+  - https://github.com/cilium/charts
+maintainers:
+  - name: Cilium Team
+    email: team@cilium.io
+icon: https://cilium.io/images/logo.svg
+annotations:
+  category: networking

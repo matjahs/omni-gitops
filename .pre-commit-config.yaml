@@ -18,10 +18,13 @@ repos:
             .*\.helmignore$|
             .*templates/.*\.yaml$|
             .*templates/.*\.yml$
+            bootstrap/.*\.yaml$|
+            bootstrap/.*\.yml$
           )
       - id: check-merge-conflict
       - id: check-added-large-files
         args: [--maxkb=1000]
+        exclude: bootstrap/talos/patches/.*\.yaml$
       - id: check-merge-conflict
       - id: mixed-line-ending
 
@@ -57,6 +60,11 @@ repos:
     hooks:
       - id: shellcheck
         args: [-x]
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.28.0
+    hooks:
+      - id: gitleaks
+        exclude: bootstrap/talos/patches/.*\.yaml$
 
   # GitGuardian for secret detection
   # - repo: https://github.com/gitguardian/ggshield
@@ -76,7 +84,8 @@ repos:
         exclude: |
           (?x)^(
             .*\.example$|
-            package-lock\.json$
+            package-lock\.json$|
+            bootstrap/talos/patches/.*\.yaml
           )
 
   # Kubernetes schema validation with kubeconform

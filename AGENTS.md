@@ -1,77 +1,37 @@
-# AGENTS.md
+# Repository Guidelines
 
-## Repository Architecture
+## Project Structure & Module Organization
+- `flux/`: Flux CD-only infrastructure, including cluster CRDs, secrets, and base services (`flux/infrastructure/`) plus infra apps (`flux/apps/`).
+- `apps/`: ArgoCD-only workload manifests organised by app; each app favours `base/` + `overlays/production` Kustomize layout.
+- `applications/`: Declarative ArgoCD `Application` resources implementing the App-of-Apps pattern.
+- `clusters/` & `docs/`: Environment-specific configs and manual references; avoid placing Flux-managed assets here.
+- Binary assets or generated artefacts should stay out of the repo; prefer external registries or secrets managers.
 
-### Hybrid GitOps: Flux CD + ArgoCD
+## Build, Test, & Development Commands
+- `task deps`: Bootstrap local tooling via Homebrew and install TalHelper.
+- `kubectl kustomize flux/`: Validate Flux renders cleanly before commit.
+- `kubectl kustomize apps/<app>/overlays/production`: Confirm ArgoCD payloads build for production overlays.
+- `flux reconcile kustomization flux-apps --with-source`: Trigger Flux to pull the latest infra changes after merge.
 
-This repository uses a **hybrid GitOps approach** with clear separation between tools:
+## Coding Style & Naming Conventions
+- Apply Prettier formatting (`npx prettier --write` or editor integration) to YAML, JSON, and Markdown prior to committing.
+- Use descriptive Kubernetes resource names; avoid abbreviations (`external-dns-rfc2136`, not `extdns`).
+- Maintain two-space indentation in YAML and keep manifests grouped logically (namespace, source, release, config).
+- Document non-obvious intent with brief comments near complex Kustomize patches only when essential.
 
-**Flux CD** manages infrastructure (`flux/` directory):
-- Platform-level resources (CRDs, cluster-wide configs)
-- Base infrastructure services (secrets, networking, storage)
-- Bootstraps ArgoCD itself
-- Path: `./flux` (restricted via Kustomization)
+## Testing Guidelines
+- Dry-run ArgoCD manifests with `kubectl kustomize` before creating or updating an `Application` spec.
+- For Helm-based Flux apps, run `helm template` against referenced charts when adjusting values.
+- Validate secret references using External Secrets tooling in a non-production cluster before rollout.
+- Capture test evidence in the PR "Testing done" section (commands, screenshots, or log excerpts).
 
-**ArgoCD** manages applications (`apps/`, `applications/` directories):
-- Application workloads and microservices
-- Environment-specific deployments
-- App-of-Apps pattern for multi-app orchestration
-- Better UI for application visibility
+## Commit & Pull Request Guidelines
+- Commits follow `fix: <context>` or `feat: <context>`; squash small tweaks before pushing.
+- PRs include a one-line summary, linked issues (if any), and the "Testing done" checklist.
+- Verify linting and Kustomize outputs locally; note any deviations or follow-up tasks in the PR body.
+- Respect Flux/Argo boundaries: infra lives under `flux/`, application workloads under `apps/` + `applications/`.
 
-### ⚠️ Two-Way Protection Mechanisms
-
-**ArgoCD cannot deploy from `flux/`:**
-- `.argocdignore` excludes `flux/` and `flux/**`
-- `flux/.argocd-source.yaml` explicit exclusion marker
-- `flux/.gitkeep` warning documentation
-
-**Flux cannot deploy from `apps/`, `applications/`, `clusters/`:**
-- `.sourceignore` excludes these directories
-- `.fluxignore` markers in each directory
-- `flux-apps` Kustomization uses `path: ./flux` (explicit scope limit)
-
-**Why this matters:**
-Running both tools on the same resources causes reconciliation loops, deployment conflicts, and audit confusion. Two-way protection ensures clear ownership boundaries and predictable behavior.
-
-### Directory Structure
-
-```
-.
-├── flux/                  # ⚠️ FLUX CD ONLY
-│   ├── infrastructure/    # Platform resources (CRDs, secrets, networking)
-│   └── apps/             # Flux-managed apps (minimal - mostly infra)
-├── apps/                  # ⚠️ ARGOCD ONLY - Application manifests
-│   ├── argocd/           # ArgoCD deployment
-│   ├── monitoring/       # Prometheus/Grafana
-│   └── ...               # Other applications
-├── applications/          # ⚠️ ARGOCD ONLY - ArgoCD Application definitions
-└── clusters/             # ⚠️ ARGOCD ONLY - Cluster-specific configs
-```
-
-### Adding Resources
-
-**For infrastructure/platform resources:**
-- Add to `flux/infrastructure/` or `flux/apps/`
-- See: `flux/README.md`
-
-**For application workloads:**
-- Add manifests to `apps/<app-name>/`
-- Create ArgoCD Application in `applications/<app-name>.yaml`
-- See: `apps/README.md` and `applications/README.md`
-
-## Code Style
-
-- Avoid abbreviations in variable names
-- Use descriptive names for Kubernetes resources
-
-## Testing
-
-- All commits must pass lint checks via Prettier
-- Validate Kustomize builds: `kubectl kustomize flux/`
-- Check ArgoCD Application syntax before committing
-
-## PR Instructions
-
-- Title format: "fix: <short description>" or "feat: <description>"
-- Include a one-line summary and a "Testing done" section
-- For GitOps changes, validate with dry-run before merging
+## Hybrid GitOps Responsibilities
+- Flux bootstraps ArgoCD and cluster primitives; do not point ArgoCD sources at `flux/`.
+- ArgoCD owns workloads; ensure Flux ignores remain intact when adding new directories.
+- When unsure which tool should manage a resource, raise the question before opening a PR to avoid reconciliation loops.

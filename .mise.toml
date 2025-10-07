@@ -1,0 +1,44 @@
+[env]
+OMNICONFIG = "{{config_root}}/omniconfig"
+KUBECONFIG = "{{config_root}}/kubeconfig"
+TALOSCONFIG = "{{config_root}}/talosconfig"
+
+[vars]
+cluster = 'cluster1'
+
+[tools]
+"aqua:siderolabs/talos" = "1.11.2"
+"aqua:siderolabs/omni/omnictl" = "1.2.1"
+"aqua:kubernetes/kubectl" = "1.34.1"
+"aqua:helmfile/helmfile" = "1.1.7"
+"aqua:cilium/cilium-cli" = "0.18.7"
+"aqua:jqlang/jq" = "1.8.1"
+"aqua:kubevirt/kubevirt/virtctl" = "1.6.0"
+
+[tasks.omni-validate]
+description = "Validate Omni configuration"
+run = [
+    "omnictl cluster template validate -f omni-mgmt.yaml",
+]
+dir = "kubernetes/bootstrap/talos"
+
+[tasks.omni-sync]
+description = 'Sync cluster'
+run = [
+    "omnictl cluster template sync -f omni-mgmt.yaml",
+    "omnictl talosconfig --merge=false --force $TALOSCONFIG",
+    "omnictl kubeconfig -c management --merge=false --force $KUBECONFIG"
+]
+dir = "kubernetes/bootstrap/talos"
+depends = ["omni-validate"]
+
+[tasks.omni-bootstrap]
+description = 'Bootstrap cluster'
+run = [
+    "until kubectl --kubeconfig $KUBECONFIG --context=k5s-home-ops-management wait --for=condition=Ready=False nodes --all --timeout=600s; do sleep 10; done",
+    "mise run omni-1password-bootstrap",
+    "helmfile --kubeconfig $KUBECONFIG --kube-context k5s-home-ops-management --file helmfile.yaml apply --skip-diff-on-install --suppress-diff",
+    "kubectl --namespace argo-system apply --server-side --filename argo-apps.yaml"
+]
+depends = ["omni-sync"]
+dir = "kubernetes/bootstrap"

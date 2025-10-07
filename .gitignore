@@ -2,7 +2,9 @@
 .idea/
 .claude/
 rolling-reboot.sh
-
+machine-config.yaml
+out/
+out-patches/
 config/
 terraform/
 
@@ -47,3 +49,6 @@ Taskfile.yml
 .cache_ggshield
 client-info.yaml
 csi-vsphere.conf
+vsan-pvc.yaml
+.gitignore
+tmp/
