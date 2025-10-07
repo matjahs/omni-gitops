@@ -18,8 +18,8 @@ machineClass:
 patches:
   - name: cilium
     file: patches/cilium.yaml
-  - name: argocd
-    file: patches/argocd.yaml
+  - name: flux
+    file: patches/flux.yaml
   - name: monitoring
     file: patches/monitoring.yaml
 ---
