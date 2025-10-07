@@ -1,0 +1,125 @@
+---
+cluster:
+  inlineManifests:
+    - name: flux-bootstrap
+      contents: |-
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: flux-bootstrap
+          labels:
+            app.kubernetes.io/component: bootstrap
+            app.kubernetes.io/name: flux-bootstrap
+        ---
+        apiVersion: v1
+        kind: ServiceAccount
+        metadata:
+          name: flux-bootstrap
+          namespace: flux-bootstrap
+          labels:
+            app.kubernetes.io/component: bootstrap
+            app.kubernetes.io/name: flux-bootstrap
+        ---
+        apiVersion: rbac.authorization.k8s.io/v1
+        kind: ClusterRoleBinding
+        metadata:
+          name: flux-bootstrap
+          labels:
+            app.kubernetes.io/component: bootstrap
+            app.kubernetes.io/name: flux-bootstrap
+        roleRef:
+          apiGroup: rbac.authorization.k8s.io
+          kind: ClusterRole
+          name: cluster-admin
+        subjects:
+          - kind: ServiceAccount
+            name: flux-bootstrap
+            namespace: flux-bootstrap
+        ---
+        apiVersion: batch/v1
+        kind: Job
+        metadata:
+          name: flux-bootstrap
+          namespace: flux-bootstrap
+          labels:
+            app.kubernetes.io/component: bootstrap
+            app.kubernetes.io/name: flux-bootstrap
+        spec:
+          ttlSecondsAfterFinished: 300
+          backoffLimit: 1
+          template:
+            metadata:
+              labels:
+                app.kubernetes.io/component: bootstrap
+                app.kubernetes.io/name: flux-bootstrap
+            spec:
+              restartPolicy: OnFailure
+              serviceAccountName: flux-bootstrap
+              containers:
+                - name: flux-cli
+                  image: ghcr.io/fluxcd/flux-cli:v2.4.0
+                  imagePullPolicy: IfNotPresent
+                  env:
+                    - name: FLUX_NAMESPACE
+                      value: flux-system
+                    - name: FLUX_GIT_REPOSITORY
+                      value: https://github.com/matjahs/omni-gitops
+                    - name: FLUX_GIT_BRANCH
+                      value: main
+                    - name: FLUX_SYNC_PATH
+                      value: ./flux
+                    - name: FLUX_SOURCE_NAME
+                      value: flux-system
+                    - name: FLUX_KUSTOMIZATION_NAME
+                      value: flux-system
+                  command:
+                    - /bin/sh
+                    - -c
+                    - |
+                      set -euo pipefail
+
+                      if flux check --components source-controller --namespace="$FLUX_NAMESPACE" >/dev/null 2>&1; then
+                        echo "Flux already installed, skipping bootstrap"
+                        exit 0
+                      fi
+
+                      echo "Installing Flux controllers"
+                      flux install \
+                        --namespace="$FLUX_NAMESPACE" \
+                        --components-extra=image-reflector-controller,image-automation-controller \
+                        --watch-all-namespaces
+
+                      echo "Waiting for Flux CRDs to be established"
+                      sleep 15
+
+                      echo "Configuring Git repository source"
+                      if flux get sources git $FLUX_SOURCE_NAME --namespace="$FLUX_NAMESPACE" >/dev/null 2>&1; then
+                        echo "GitRepository $FLUX_SOURCE_NAME already exists"
+                      else
+                        flux create source git $FLUX_SOURCE_NAME \
+                          --namespace="$FLUX_NAMESPACE" \
+                          --url="$FLUX_GIT_REPOSITORY" \
+                          --branch="$FLUX_GIT_BRANCH" \
+                          --interval=1m
+                      fi
+
+                      echo "Creating root kustomization"
+                      if flux get kustomization $FLUX_KUSTOMIZATION_NAME --namespace="$FLUX_NAMESPACE" >/dev/null 2>&1; then
+                        echo "Kustomization $FLUX_KUSTOMIZATION_NAME already exists"
+                      else
+                        flux create kustomization $FLUX_KUSTOMIZATION_NAME \
+                          --namespace="$FLUX_NAMESPACE" \
+                          --source=GitRepository/$FLUX_SOURCE_NAME \
+                          --path="$FLUX_SYNC_PATH" \
+                          --prune=true \
+                          --interval=1m \
+                          --retry-interval=1m \
+                          --timeout=2m
+                      fi
+
+                      echo "Flux bootstrap complete"
+              securityContext:
+                runAsNonRoot: true
+                runAsUser: 65534
+                runAsGroup: 65534
+                fsGroup: 65534
