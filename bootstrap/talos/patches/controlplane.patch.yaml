@@ -1,0 +1,6 @@
+---
+machine:
+  files:
+    - path: /var/mnt/local-path-provisioner
+      permissions: 0777
+      directory: true
