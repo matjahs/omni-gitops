@@ -6,5 +6,4 @@ resources:
   - flux-external-secrets.yaml
   - flux-secrets-config.yaml
   - flux-infra.yaml
-  - flux-cilium-gateway.yaml
   - flux-apps.yaml
