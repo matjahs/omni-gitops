@@ -2,7 +2,4 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 # Temporarily remove synology-csi until storage stack revisited
-resources:
-  - ./argocd
-  - ./external-dns
-  - ../../apps/cilium-gateway/gateway/base
+resources: [./argocd, ./external-dns]
