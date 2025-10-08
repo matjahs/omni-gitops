@@ -26,3 +26,39 @@
     ├── argocd.yaml           # ArgoCD manages itself
     └── metrics-server.yaml
 ```
+
+
+## Cilium & Flux Recovery Cheatsheet
+
+### Full Flux Reset
+1. flux suspend kustomization flux-system || true
+2. flux uninstall --namespace flux-system --keep-namespace=false
+3. kubectl delete namespace flux-system --ignore-not-found
+4. (Optional) Remove Flux CRDs:
+   kubectl get crds | grep -E 'kustomize.toolkit.fluxcd.io|source.toolkit.fluxcd.io|helm.toolkit.fluxcd.io|notification.toolkit.fluxcd.io' | awk '{print $1}' | xargs -r kubectl delete crd
+5. Re-bootstrap:
+   flux bootstrap github --owner matjahs --repository omni-gitops --branch main --path flux --personal
+6. Verify & force sync:
+   flux get kustomizations
+   flux reconcile kustomization flux-system --with-source
+
+### Cilium CRDs Missing / Agent Timeouts
+Symptoms: Pod sandbox create failures, cilium-agent logs show 'could not find the requested resource' for Cilium* CRDs.
+
+Fix (manual quick):
+1. kubectl get crds | grep cilium || echo "No Cilium CRDs"
+2. helm repo add cilium https://helm.cilium.io && helm repo update
+3. helm upgrade --install cilium cilium/cilium \
+   -n kube-system --create-namespace \
+   --set k8sServiceHost=<API_SERVER_IP> --set k8sServicePort=6443 \
+   --set kubeProxyReplacement=strict
+4. kubectl -n kube-system get pods -l k8s-app=cilium
+5. After Ready: kubectl delete pod -n kube-system -l k8s-app=cilium (to recreate any failed endpoints)
+
+GitOps-managed approach:
+- Manage a Cilium HelmRelease under flux/infrastructure first; ensure its CRDs apply before app namespaces depending on Cilium policies.
+- If reinstalling via Flux, delete leftover cilium* CRDs only if versions drift, then let HelmRelease recreate.
+
+### ExternalSecret Ordering
+- Ensure external-secrets HelmRelease (CRDs) reconciles before any ExternalSecret resources.
+- Use separate Kustomization with dependsOn or temporarily comment ExternalSecret manifests (as done for synology-csi) until CRDs exist.
