@@ -1,6 +1,6 @@
 ---
 kind: Cluster
-name: omni-contrib
+name: cluster1
 talos:
   version: v1.11.2
 kubernetes:
@@ -10,10 +10,14 @@ features:
 patches:
   - name: cni
     file: patches/cni.yaml
+  - name: cilium
+    file: patches/cilium.yaml
+  - name: flux
+    file: patches/flux.yaml
 ---
 kind: ControlPlane
 machineClass:
-  name: omni-contrib-controlplane
+  name: cluster1-controlplane
   size: 3
 patches:
   - name: cilium
@@ -26,5 +30,8 @@ patches:
 kind: Workers
 name: workers
 machineClass:
-  name: omni-contrib-workers
+  name: cluster1-workers
   size: unlimited
+patches:
+  - name: workers
+    file: patches/workers.patch.yaml

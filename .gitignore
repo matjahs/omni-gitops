@@ -7,6 +7,8 @@ out/
 out-patches/
 config/
 terraform/
+*.iso
+*.ova
 
 .DS_Store
 *.log
@@ -44,7 +46,7 @@ splunk/deployment-apps/forwarder_outputs/metadata/local.meta
 .taskfiles/talos/Taskfile.yaml
 .taskfiles/talos/upgrade.yaml
 .taskfiles/tools/precommit.yaml
-Taskfile.yml
+
 .cache/
 .cache_ggshield
 client-info.yaml
