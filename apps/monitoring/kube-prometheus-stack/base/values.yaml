@@ -1,63 +1,48 @@
 ---
-# Kube-Prometheus-Stack Base Values
-# Prometheus configuration
-prometheus:
-  enabled: true
-  prometheusSpec:
-    retention: 30d
-    storageSpec:
-      volumeClaimTemplate:
-        spec:
-          storageClassName: synology-csi-synology-csi-synology-iscsi-storage
-          accessModes: [ReadWriteOnce]
-          resources:
-            requests:
-              storage: 50Gi
-    resources:
-      requests:
-        cpu: 500m
-        memory: 2Gi
-      limits:
-        cpu: 2000m
-        memory: 4Gi
-# Grafana configuration
-grafana:
-  enabled: true
-  adminPassword: admin  # pragma: allowlist secret
-  persistence:
-    enabled: true
-    storageClassName: synology-csi-synology-csi-synology-iscsi-storage
-    size: 10Gi
-  resources:
-    requests:
-      cpu: 100m
-      memory: 128Mi
-    limits:
-      cpu: 500m
-      memory: 512Mi
-# AlertManager configuration
-alertmanager:
-  enabled: true
-  alertmanagerSpec:
-    storage:
-      volumeClaimTemplate:
-        spec:
-          storageClassName: synology-csi-synology-csi-synology-iscsi-storage
-          accessModes: [ReadWriteOnce]
-          resources:
-            requests:
-              storage: 10Gi
-    resources:
-      requests:
-        cpu: 100m
-        memory: 128Mi
-      limits:
-        cpu: 500m
-        memory: 256Mi
-# Disable components not needed
-kubeStateMetrics:
-  enabled: true
-nodeExporter:
-  enabled: true
-prometheusOperator:
-  enabled: true
+kube-prometheus-stack:
+  # NOTE: These must be set manually to the control plane IP addresses
+  # kubeEtcd:
+  #  endpoints:
+  #    - x.y.z.a
+  #    - x.y.z.b
+  #    - x.y.z.c
+  kubeControllerManager:
+    service:
+      selector:
+        k8s-app: kube-controller-manager
+  kubeScheduler:
+    service:
+      selector:
+        k8s-app: kube-scheduler
+  alertmanager:
+    alertmanagerSpec:
+      storage:
+        volumeClaimTemplate:
+          spec:
+            accessModes: [ReadWriteOnce]
+            resources:
+              requests:
+                storage: 10Gi
+  prometheus:
+    prometheusSpec:
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            accessModes: [ReadWriteOnce]
+            resources:
+              requests:
+                storage: 150Gi
+  grafana:
+    grafana.ini:
+      auth:
+        disable_login_form: true
+        disable_signout_menu: true
+      auth.basic:
+        enabled: false
+      auth.anonymous:
+        enabled: true
+    # Allow Omni Workload Proxying for this service
+    service:
+      annotations:
+        omni-kube-service-exposer.sidero.dev/port: '50082'
+        omni-kube-service-exposer.sidero.dev/label: Grafana

@@ -18,7 +18,7 @@ total=0
 app_files=$(find "${REPO_ROOT}/applications" -name "*.yaml" -o -name "*.yml" | grep -v kustomization)
 
 for app_file in ${app_files}; do
-  relative_path="${app_file#${REPO_ROOT}/}"
+  relative_path="${app_file#"${REPO_ROOT}"/}"
   total=$((total + 1))
 
   echo -n "  Checking ${relative_path}... "
@@ -41,7 +41,7 @@ for app_file in ${app_files}; do
   name=$(yq eval '.metadata.name' "${app_file}")
   namespace=$(yq eval '.metadata.namespace' "${app_file}")
   source_path=$(yq eval '.spec.source.path // .spec.sources[0].path' "${app_file}")
-  dest_namespace=$(yq eval '.spec.destination.namespace' "${app_file}")
+  # dest_namespace=$(yq eval '.spec.destination.namespace' "${app_file}")
 
   if [ "${name}" == "null" ]; then
     echo "❌ Missing metadata.name"
@@ -52,8 +52,9 @@ for app_file in ${app_files}; do
   if [ "${namespace}" != "argocd" ]; then
     echo "⚠️  Application not in argocd namespace (${namespace})"
   fi
-
-  if [ "${source_path}" != "null" ] && [ ! -d "${REPO_ROOT}/${source_path}" ]; then
+  # Only check source path existence if repoURL points to this repo
+  repo_url=$(yq eval '.spec.source.repoURL // .spec.sources[0].repoURL' "${app_file}")
+  if [ "${repo_url}" == "https://github.com/matjahs/omni-gitops.git" ] && [ "${source_path}" != "null" ] && [ ! -d "${REPO_ROOT}/${source_path}" ]; then
     echo "❌ Source path does not exist: ${source_path}"
     failed=$((failed + 1))
     continue

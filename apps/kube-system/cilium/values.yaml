@@ -1,50 +1,51 @@
 ---
-# Cilium Helm Values
-# Enable L2 Announcements for LoadBalancer IPAM
-# Existing configuration (from helm get values)
-gatewayAPI:
-  enabled: true
-  enableAlpn: true
-  enableAppProtocol: true
-hubble:
-  enabled: true
-  relay:
+cilium:
+  kubeProxyReplacement: true
+  ipam:
+    mode: kubernetes
+  securityContext:
+    capabilities:
+      ciliumAgent:
+        - CHOWN
+        - KILL
+        - NET_ADMIN
+        - NET_RAW
+        - IPC_LOCK
+        - SYS_ADMIN
+        - SYS_RESOURCE
+        - DAC_OVERRIDE
+        - FOWNER
+        - SETGID
+        - SETUID
+      cleanCiliumState: [NET_ADMIN, SYS_ADMIN, SYS_RESOURCE]
+  cgroup:
+    host: /sys/fs/cgroup
+    autoMount:
+      enabled: false
+  # Enable Cilium ingress controller
+  ingressController:
     enabled: true
-  ui:
+  # Use KubePrism to access cluster API
+  k8sServiceHost: localhost
+  k8sServicePort: 7445
+  # Enable Hubble
+  hubble:
+    relay:
+      enabled: true
+    ui:
+      enabled: true
+      service:
+        annotations:
+          omni-kube-service-exposer.sidero.dev/label: Hubble
+          omni-kube-service-exposer.sidero.dev/port: '50080'
+  gatewayAPI:
     enabled: true
-  metrics:
-    enabled: [dns, drop, tcp, flow, port-distribution]
-ipam:
-  mode: kubernetes
-k8sServiceHost: localhost
-k8sServicePort: 7445
-kubeProxyReplacement: true
-operator:
-  replicas: 1
-routingMode: tunnel
-securityContext:
-  capabilities:
-    ciliumAgent:
-      - CHOWN
-      - KILL
-      - NET_ADMIN
-      - NET_RAW
-      - IPC_LOCK
-      - SYS_ADMIN
-      - SYS_RESOURCE
-      - DAC_OVERRIDE
-      - FOWNER
-      - SETGID
-      - SETUID
-# NEW: Enable L2 Announcements for LoadBalancer IPAM
-l2announcements:
-  enabled: true
-  # How long a node will hold the announcement lease
-  leaseDuration: 15s
-  # How often to renew the lease
-  leaseRenewDeadline: 5s
-  # How long to wait before retrying a failed announcement
-  leaseRetryPeriod: 2s
-# Enable external IPs management
-externalIPs:
-  enabled: true
+    enableAlpn: true
+    enableAppProtocol: true
+  l2announcements:
+    enabled: true
+    leaseDuration: 15s
+    leaseRenewDeadline: 5s
+    leaseRetryPeriod: 2s
+  externalIPs:
+    enabled: true
