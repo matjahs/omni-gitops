@@ -7,6 +7,9 @@ kubernetes:
   version: 1.34.1
 features:
   enableWorkloadProxy: true
+  useEmbeddedDiscoveryService: true
+  backupConfiguration:
+    interval: 1h0m0s
 patches:
   - name: cni
     file: patches/cni.yaml
@@ -37,12 +40,3 @@ machineClass:
 patches:
   - name: workers
     file: patches/workers.patch.yaml
-# ---
-# apiVersion: v1alpha1
-# kind: UserVolumeConfig
-# name: longhorn-volume
-# provisioning:
-  # diskSelector:
-    # match: "!system_disk"
-  # minSize: 100GB
-  # maxSize: 200GB
