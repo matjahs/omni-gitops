@@ -34,7 +34,7 @@ Store secrets in Vault KV v2 engine:
 vault secrets enable -version=2 -path=secret kv
 
 # Store the Cloudflare API token
-vault kv put secret/cloudflare api-token="YOUR_CLOUDFLARE_TOKEN"
+vault kv put secret/cloudflare api-token="YOUR_CLOUDFLARE_TOKEN"  # ESO syncs to cert-manager, argocd, external-dns namespaces
 ```
 
 ### 2. Create Vault Token
@@ -98,6 +98,8 @@ kubectl get externalsecrets -A
 kubectl get secret cloudflare-api-token -n argocd
 kubectl get secret cloudflare-api-token -n cert-manager
 ```
+100.1.kubectl get secret cloudflare-api-token -n external-dns
+
 
 ## Vault Secret Structure
 
@@ -182,6 +184,8 @@ kubectl annotate externalsecret <name> -n <namespace> force-sync=$(date +%s)
 ```
 
 ## Migration from Hardcoded Secrets
+186.1.- ✅ `cloudflare-api-token` (external-dns namespace)
+
 
 The following secrets have been migrated to Vault:
 - ✅ `cloudflare-api-token` (argocd namespace)
