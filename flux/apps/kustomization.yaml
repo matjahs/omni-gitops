@@ -2,4 +2,4 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 # Temporarily remove synology-csi until storage stack revisited
-resources: [./argocd, ./external-dns, ./cert-manager]
+resources: [./argocd, ./external-dns, ./cert-manager, ./cilium]
