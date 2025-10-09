@@ -5,13 +5,13 @@ metadata:
   name: gateway-dashboard
   namespace: cilium-gateway-system
   annotations:
-    external-dns.alpha.kubernetes.io/hostname: gateway.apps.lab.mxe11.nl
+    external-dns.alpha.kubernetes.io/hostname: dns.apps.lab.mxe11.nl
 spec:
   parentRefs:
     - name: cilium-secure-gateway
       namespace: cilium-gateway-system
       sectionName: https
-  hostnames: [gateway.apps.lab.mxe11.nl]
+  hostnames: [dns.apps.lab.mxe11.nl]
   rules:
     - backendRefs:
         - name: gateway-dashboard

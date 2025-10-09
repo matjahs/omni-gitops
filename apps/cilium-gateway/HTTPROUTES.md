@@ -108,7 +108,7 @@ Base domain: `*.apps.lab.mxe11.nl`
 ## Gateway Dashboard
 
 ### Cilium Gateway Status Dashboard
-- **URL**: https://gateway.apps.lab.mxe11.nl
+- **URL**: https://gw.apps.lab.mxe11.nl
 - **Service**: `cilium-gateway-dashboard` (namespace: `cilium-gateway-system`)
 - **Port**: 80
 - **Purpose**: Real-time status dashboard for all HTTPRoutes and Gateways
@@ -124,6 +124,7 @@ All routes use external-dns annotations to automatically create DNS records:
 annotations:
   external-dns.alpha.kubernetes.io/hostname: <service>.apps.lab.mxe11.nl
 ```
+containerd config default > /etc/containerd/config.tomnl && sudo sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' /etc/containerd/config.toml && sudo systemctl restart containerd
 
 DNS records should point to the secure gateway IP: **172.16.20.208**
 
