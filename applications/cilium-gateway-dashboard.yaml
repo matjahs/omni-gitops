@@ -15,7 +15,7 @@ spec:
   source:
     repoURL: https://github.com/matjahs/omni-gitops.git
     targetRevision: HEAD
-    path: apps/cilium-gateway/dashboard/overlays/production
+    path: apps/cilium-gateway/dashboard
   destination:
     server: https://kubernetes.default.svc
     namespace: cilium-gateway-system
