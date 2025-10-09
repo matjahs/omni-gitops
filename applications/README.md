@@ -88,6 +88,41 @@ This separation provides:
 - Independent tool lifecycles
 - Optimized workflows for different use cases
 
+
+## Application Dependency Flow
+
+```mermaid
+graph TD
+  subgraph Waves
+    A0[root-applications\nwave 0] --> A1[argocd-config\nwave 0]
+    A0 --> L[longhorn\nwave 0]
+  end
+
+  subgraph Network & Gateway
+    C[cilium (AppSet)\nwave 2] --> GW[cilium-gateway\nwave 1]
+    C --> GWD[cilium-gateway-dashboard\nwave 1]
+  end
+
+  subgraph Security & Certs
+    ESO[external-secrets (operator)\nwave 0] --> ESOC[external-secrets-config\nwave 1]
+    C --> CM[cert-manager\nwave 1]
+    ESOC --> EDNS[external-dns\nwave 2]
+    CM --> EDNS
+  end
+
+  subgraph Monitoring
+    MON[monitoring\nwave 0] --> UK[uptime-kuma\nwave 0]
+  end
+
+  C --> EDNS
+  L --> MON
+```
+
+Notes:
+- Sync waves control relative ordering; lower waves sync first.
+- external-secrets operator installs CRDs before config (wave 1) and consumers (external-dns wave 2).
+- Cilium (wave 2) is delayed until CRDs or prerequisites (if any) are satisfied; gateway components reference Cilium networking.
+
 ## References
 
 - [ArgoCD Applications](https://argo-cd.readthedocs.io/en/stable/operator-manual/declarative-setup/#applications)
