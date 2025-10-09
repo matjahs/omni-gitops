@@ -14,20 +14,19 @@ ArgoCD Applications are meta-resources that define:
 - How to deploy (sync policy, health checks, etc.)
 
 ## Structure
-
 ```
 applications/
-├── kustomization.yaml          # Kustomize wrapper for all applications
-├── argocd.yaml                 # ArgoCD deployment
-├── argocd-config.yaml          # ArgoCD configuration
-├── cert-manager.yaml           # Certificate management
-├── cilium-gateway.yaml         # Cilium Gateway API
-├── external-dns.yaml   # External DNS with RFC2136
-├── external-secrets.yaml       # External Secrets Operator
-├── external-secrets-config.yaml # ESO configuration
-├── hubble-ui.yaml              # Cilium Hubble observability
-├── monitoring.yaml             # Prometheus/Grafana stack
-└── uptime-kuma.yaml            # Uptime monitoring
+├── kustomization.yaml              # Aggregates all ArgoCD Application manifests
+├── argocd.yaml                     # ArgoCD core deployment
+├── argocd-config.yaml              # ArgoCD configuration resources
+├── cert-manager.yaml               # Certificate management (cert-manager)
+├── cilium-gateway.yaml             # Cilium Gateway API integration
+├── external-dns.yaml               # External DNS (RFC2136 provider)
+├── external-secrets.yaml           # External Secrets Operator deployment
+├── external-secrets-config.yaml    # External Secrets Operator configuration
+├── hubble-ui.yaml                  # Cilium Hubble observability UI
+├── monitoring.yaml                 # Monitoring stack (Prometheus, Grafana)
+└── uptime-kuma.yaml                # Uptime monitoring (Uptime Kuma)
 ```
 
 ## Flux Protection
