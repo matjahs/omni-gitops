@@ -54,3 +54,4 @@ csi-vsphere.conf
 vsan-pvc.yaml
 .gitignore
 tmp/
+bootstrap/talos/my-cluster-exported-template.yaml

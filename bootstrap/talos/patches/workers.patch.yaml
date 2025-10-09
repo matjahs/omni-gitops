@@ -12,7 +12,5 @@ machine:
         options: [bind, rshared, rw]
   kernel:
     modules:
-      - name: iscsi_tcp   # For Longhorn engine (iSCSI)
-      - name: nbd         # For instance manager (block device mapping)
-      - name: nvme_tcp    # Per Longhorn Talos docs (future NVMe over TCP)
-      - name: vfio_pci    # For potential PCI passthrough / future enhancements
+      - name: nvme_tcp  # Longhorn Talos docs requirement
+      - name: vfio_pci  # Longhorn Talos docs requirement
