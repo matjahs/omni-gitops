@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: argocd-cm
+data:
+  application.resourceTrackingMethod: annotation
+  configManagementPlugins: |-
+    - name: kustomize-helm
+      init:
+        command: ["/bin/sh","-c"]
+        args: ["helm dependency build || true"]
+      generate:
+        command: ["/bin/sh","-c"]
+        args: ["helm template . --name-template $ARGOCD_APP_NAME --namespace $ARGOCD_APP_NAMESPACE --include-crds > all.yaml && kustomize build ."]

@@ -390,7 +390,7 @@ spec:
 
 #### 2.7 Migrate ArgoCD (Most Critical - Do Last!)
 
-File: `apps/argocd/argocd/overlays/production/argocd-httproute.yaml`
+File: `apps/argocd/overlays/production/httproute.yaml`
 
 ```yaml
 ---
