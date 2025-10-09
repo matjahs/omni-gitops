@@ -1,0 +1,8 @@
+---
+name: example-app
+path: apps/example-app/overlays/production
+wave: 2
+project: default
+namespace: example
+createNamespace: true
+enabled: false  # set to true to activate

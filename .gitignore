@@ -55,4 +55,4 @@ vsan-pvc.yaml
 .gitignore
 tmp/
 bootstrap/talos/my-cluster-exported-template.yaml
-apps/example-app/
+# apps/example-app/ removed from ignore to keep scaffolding example
