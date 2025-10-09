@@ -55,3 +55,4 @@ vsan-pvc.yaml
 .gitignore
 tmp/
 bootstrap/talos/my-cluster-exported-template.yaml
+apps/example-app/

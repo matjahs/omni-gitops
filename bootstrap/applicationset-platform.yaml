@@ -1,0 +1,65 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: platform-applications
+  namespace: argocd
+spec:
+  goTemplate: true
+  generators:
+    - git:
+        repoURL: https://github.com/matjahs/omni-gitops.git
+        revision: HEAD
+        files:
+          - path: apps/**/app.yaml
+  template:
+    metadata:
+      name: '{{ .name }}'
+      annotations: {}
+      # sync-wave optional: set wave in app.yaml to add annotation manually
+      labels:
+        app.kubernetes.io/managed-by: argocd
+        app.kubernetes.io/part-of: platform
+    spec:
+      project: '{{ default "default" .project }}'
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: '{{ default .name .namespace }}'
+      syncPolicy:
+        automated:
+          prune: true
+          selfHeal: true
+        syncOptions:
+          - CreateNamespace={{ default "true" .createNamespace }}
+      # For pure Helm + overlay, set type: helm in app.yaml
+      sources:
+        - repoURL: '{{ .repoURL }}'
+          chart: '{{ .chart }}'
+          targetRevision: '{{ .version }}'
+          helm:
+            releaseName: '{{ .name }}'
+            {{- if .valueFiles }}
+            valueFiles:
+            {{- range .valueFiles }}
+              - {{ . }}
+            {{- end }}
+            {{- end }}
+
+      source:
+        repoURL: https://github.com/matjahs/omni-gitops.git
+        targetRevision: HEAD
+        path: '{{ .path }}'
+      {{- if .ignoreDiff }}
+      ignoreDifferences:
+        {{- range .ignoreDiff }}
+        - group: {{ .group }}
+          kind: {{ .kind }}
+          name: {{ .name }}
+          {{- if .jsonPointers }}
+          jsonPointers:
+            {{- range .jsonPointers }}
+            - {{ . }}
+            {{- end }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
