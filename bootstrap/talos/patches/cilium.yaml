@@ -78,7 +78,7 @@ cluster:
                   - cilium
                   - install
                   - --version
-                  - 1.18.2
+                  - 1.19.0-pre.0
                   - --set
                   - ipam.mode=kubernetes
                   - --set

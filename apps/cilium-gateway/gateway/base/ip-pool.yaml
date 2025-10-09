@@ -1,5 +1,5 @@
 ---
-apiVersion: cilium.io/v2alpha1
+apiVersion: cilium.io/v2
 kind: CiliumLoadBalancerIPPool
 metadata:
   name: cilium-gateway-pool
@@ -11,4 +11,4 @@ spec:
   serviceSelector:
     matchExpressions:
       - key: io.cilium.gateway/owning-gateway
-        operator: Exists  # Match any Gateway-owned service
+        operator: Exists

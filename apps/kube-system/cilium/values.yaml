@@ -1,5 +1,6 @@
 ---
 cilium:
+  
   kubeProxyReplacement: true
   ipam:
     mode: kubernetes
