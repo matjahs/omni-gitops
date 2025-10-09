@@ -1,18 +1,18 @@
 ---
-# Strategic merge patch for worker nodes to support Longhorn
-machine:
-  filesystems:
-    - device: /dev/sdb
-      format: ext4
-      mountpoint: /var/lib/longhorn
-      options: [defaults]
-  kubelet:
-    extraMounts:
-      - destination: /var/lib/longhorn
-        type: bind
-        source: /var/lib/longhorn
-        options: [bind, rshared, rw]
-  kernel:
-    modules:
-      - name: iscsi_tcp
-      - name: nbd
+# JSON6902 style patch for worker nodes Longhorn support
+# Adds required kernel modules and bind mount with rshared propagation.
+- op: add
+  path: /machine/kernel/modules/-
+  value:
+    name: iscsi_tcp
+- op: add
+  path: /machine/kernel/modules/-
+  value:
+    name: nbd
+- op: add
+  path: /machine/kubelet/extraMounts/-
+  value:
+    destination: /var/lib/longhorn
+    type: bind
+    source: /var/lib/longhorn
+    options: [bind, rshared, rw]
