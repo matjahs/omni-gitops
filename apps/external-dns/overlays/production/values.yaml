@@ -1,6 +1,6 @@
 ---
 # RFC2136 provider for Technitium DNS
-fullnameOverride: external-dns-rfc2136
+fullnameOverride: external-dns
 sources: [service, ingress, gateway-httproute]
 provider:
   name: rfc2136
@@ -27,7 +27,7 @@ policy: sync
 
 # Registry type for tracking ownership
 registry: txt
-txtOwnerId: external-dns-rfc2136
+txtOwnerId: external-dns
 txtPrefix: external-dns-
 
 # Sync interval

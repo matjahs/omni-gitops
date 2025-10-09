@@ -16,7 +16,7 @@
 
 ## Coding Style & Naming Conventions
 - Apply Prettier formatting (`npx prettier --write` or editor integration) to YAML, JSON, and Markdown prior to committing.
-- Use descriptive Kubernetes resource names; avoid abbreviations (`external-dns-rfc2136`, not `extdns`).
+- Use descriptive Kubernetes resource names; avoid abbreviations (`external-dns`, not `extdns`).
 - Maintain two-space indentation in YAML and keep manifests grouped logically (namespace, source, release, config).
 - Document non-obvious intent with brief comments near complex Kustomize patches only when essential.
 - Example: Add comments for patches that modify sensitive RBAC roles.
