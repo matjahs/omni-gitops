@@ -1,6 +1,4 @@
 ---
-# Longhorn Talos support per docs 1.9.2
-# Prepare dedicated disk, ensure rshared propagation, load required modules.
 - op: add
   path: /machine/filesystems/-
   value:
