@@ -1,16 +1,13 @@
 ---
+# Longhorn Talos support per docs 1.9.2
+# Prepare dedicated disk, ensure rshared propagation, load required modules.
 - op: add
-  path: /machine/files/-
-  value:
-    path: /var/mnt/local-path-provisioner
-    permissions: 0777
-    directory: true
-- op: add
-  patch: /machine/filesystems/-
+  path: /machine/filesystems/-
   value:
     device: /dev/sdb
+    format: ext4
     mountpoint: /var/lib/longhorn
-    options: [defaults, rw]
+    options: [defaults]
 - op: add
   path: /machine/kubelet/extraMounts/-
   value:
@@ -18,3 +15,11 @@
     type: bind
     source: /var/lib/longhorn
     options: [bind, rshared, rw]
+- op: add
+  path: /machine/kernel/modules/-
+  value:
+    name: iscsi_tcp
+- op: add
+  path: /machine/kernel/modules/-
+  value:
+    name: nbd

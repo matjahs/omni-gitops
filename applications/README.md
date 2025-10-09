@@ -20,7 +20,7 @@ applications/
 ├── argocd-config.yaml          # ArgoCD configuration
 ├── cert-manager.yaml           # Certificate management
 ├── cilium-gateway.yaml         # Cilium Gateway API
-├── external-dns-rfc2136.yaml   # External DNS with RFC2136
+├── external-dns.yaml   # External DNS with RFC2136
 ├── external-secrets.yaml       # External Secrets Operator
 ├── external-secrets-config.yaml # ESO configuration
 ├── hubble-ui.yaml              # Cilium Hubble observability
