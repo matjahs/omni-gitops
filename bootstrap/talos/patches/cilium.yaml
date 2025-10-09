@@ -104,6 +104,8 @@ cluster:
                   - --set
                   - gatewayAPI.enabled=true
                   - --set
+                  - gatewayAPI.enableTLSRoutes=false
+                  - --set
                   - gatewayAPI.enableAlpn=true
                   - --set
                   - gatewayAPI.enableAppProtocol=true

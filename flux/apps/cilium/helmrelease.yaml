@@ -24,6 +24,7 @@ spec:
   values:
     gatewayAPI:
       enabled: true
+      enableTLSRoutes: false
     hubble:
       enabled: true
       relay:
