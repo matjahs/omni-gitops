@@ -1,0 +1,7 @@
+---
+name: example-kustomize
+path: apps/example-kustomize/overlays/production
+namespace: example-kustomize
+createNamespace: true
+wave: 2
+enabled: false

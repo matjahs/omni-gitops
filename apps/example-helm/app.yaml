@@ -1,0 +1,11 @@
+---
+name: example-helm
+type: helm
+repoURL: https://charts.bitnami.com/bitnami
+chart: nginx
+version: 15.0.0
+namespace: example-helm
+createNamespace: true
+path: apps/example-helm/overlays/production
+wave: 3
+enabled: false

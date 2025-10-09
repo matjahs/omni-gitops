@@ -1,0 +1,11 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: example-kustomize
+spec:
+  selector:
+    app: example-kustomize
+  ports:
+    - port: 80
+      targetPort: 80

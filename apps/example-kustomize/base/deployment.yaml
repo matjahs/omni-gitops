@@ -1,0 +1,20 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: example-kustomize
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: example-kustomize
+  template:
+    metadata:
+      labels:
+        app: example-kustomize
+    spec:
+      containers:
+        - name: web
+          image: nginx:1.27-alpine
+          ports:
+            - containerPort: 80
