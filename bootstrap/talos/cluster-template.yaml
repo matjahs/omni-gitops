@@ -17,6 +17,8 @@ patches:
     file: patches/cilium.yaml
   - name: flux
     file: patches/flux.yaml
+  - name: networking
+    file: patches/networking.yaml
 ---
 kind: ControlPlane
 machineClass:
