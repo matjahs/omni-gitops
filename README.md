@@ -60,9 +60,8 @@ GitOps-managed approach:
 - If reinstalling via Flux, delete leftover cilium* CRDs only if versions drift, then let HelmRelease recreate.
 
 ### ExternalSecret Ordering
-- Ensure external-secrets HelmRelease (CRDs) reconciles before any ExternalSecret resources.
-- Use separate Kustomization with dependsOn or temporarily comment ExternalSecret manifests (as done for synology-csi) until CRDs exist.
-
+- Managed entirely by ArgoCD; operator + CRDs installed via applications/external-secrets.yaml.
+- Flux no longer deploys external-secrets; remove any stale HelmRelease before relying on Argo config.
 
 ## Flux Layered Kustomization Flow
 
@@ -71,11 +70,7 @@ Text diagram:
 GitRepository flux-system
   ├─ Kustomization flux-gateway (Gateway API CRDs)
   │    provides: gateway.networking.k8s.io/* (HTTPRoute, Gateway, etc.)
-  ├─ Kustomization flux-external-secrets (external-secrets HelmRelease installs CRDs)
-  │    dependsOn: flux-gateway
-  │    provides: external-secrets.io CRDs
-  ├─ Kustomization flux-secrets-config (ClusterSecretStore, ExternalSecrets)
-  │    dependsOn: flux-external-secrets
+  ├─ Kustomization flux-secrets-config (ClusterSecretStore, ExternalSecrets references)  # now only ESO consumer manifests if any remain under flux/
   ├─ Kustomization flux-infra (remaining infra: snapshot CRDs, etc.)
   │    independent but ordered before apps
   └─ Kustomization flux-apps (workload HelmReleases / manifests)
@@ -87,21 +82,20 @@ Mermaid:
 graph TD
   A[GitRepository flux-system]
   A --> B[flux-gateway\nGateway API CRDs]
-  B --> C[flux-external-secrets\nHelmRelease]
-  C --> D[flux-secrets-config\nClusterSecretStore + ExternalSecrets]
+  B --> D[flux-secrets-config\n(ClusterSecretStore / ExternalSecrets)]
   D --> E[flux-infra\nOther infra]
   E --> F[flux-apps\nWorkloads]
 ```
 
 Readiness contract:
-1. CRDs first (gateway, external-secrets)
+1. CRDs first (gateway, external-secrets via ArgoCD)
 2. Configuration objects referencing those CRDs
 3. Supporting infra controllers
 4. Application workloads
 
 Troubleshooting order:
 1. flux get kustomization flux-gateway
-2. flux get kustomization flux-external-secrets
+2. (deprecated) remove any leftover flux-external-secrets Kustomization if present
 3. kubectl get crds | grep -E 'gateway.networking|external-secrets'
 4. flux get kustomization flux-secrets-config
 5. flux get kustomization flux-infra

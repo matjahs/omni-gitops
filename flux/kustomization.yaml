@@ -1,9 +1,4 @@
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-resources:
-  - flux-gateway.yaml
-  - flux-external-secrets.yaml
-  - flux-secrets-config.yaml
-  - flux-infra.yaml
-  - flux-apps.yaml
+resources: [flux-gateway.yaml, flux-infra.yaml, flux-apps.yaml]
