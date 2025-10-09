@@ -1,3 +1,2 @@
----
 # Longhorn Talos support (control plane usually not storing data but keep consistent mount propagation if needed later)
 # No Longhorn-specific changes required on control plane per docs; removing unused local-path dir.

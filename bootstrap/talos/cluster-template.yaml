@@ -26,8 +26,8 @@ patches:
     file: patches/flux.yaml
   - name: monitoring
     file: patches/monitoring.yaml
-  - name: controlplane
-    file: patches/controlplane.patch.yaml
+  # - name: controlplane
+  #   file: patches/controlplane.patch.yaml
 ---
 kind: Workers
 name: workers
