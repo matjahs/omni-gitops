@@ -77,8 +77,16 @@ cluster:
                 command:
                   - cilium
                   - install
+                  - --version
+                  - 1.15.6
                   - --set
                   - ipam.mode=kubernetes
+                  - --set
+                  - loadBalancer.ipam.mode=cluster-pool
+                  - --set
+                  - loadBalancer.ipam.operator.clusterPoolIPv4PodCIDRList=10.244.0.0/16
+                  - --set
+                  - loadBalancer.l2announcements.enabled=true
                   - --set
                   - kubeProxyReplacement=true
                   - --set
