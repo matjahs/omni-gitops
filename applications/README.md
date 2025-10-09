@@ -1,4 +1,6 @@
 # ArgoCD Applications
+<!-- NOTE: ApplicationSet migration in progress: example-helm and example-kustomize demonstrate new app.yaml metadata pattern. -->
+
 
 ⚠️ **IMPORTANT**: This directory is managed exclusively by **ArgoCD**. Flux CD is prevented from deploying resources from this directory via `.sourceignore` in the repository root.
 
@@ -88,6 +90,45 @@ This separation provides:
 - Independent tool lifecycles
 - Optimized workflows for different use cases
 
+
+
+## ApplicationSet Metadata Pattern
+
+Two scaffolded examples illustrate replacing per-Application YAML with a single ApplicationSet + per-app metadata file (`app.yaml`).
+
+### 1. Pure Helm (no base dir needed)
+Directory: `apps/example-helm/`
+Files:
+- `app.yaml` (metadata: name, type: helm, repoURL, chart, version, namespace, wave, enabled)
+- `overlays/production/kustomization.yaml` (optional placeholder if you later patch)
+Behaviour: ApplicationSet reads `app.yaml` and renders an Argo CD Application using Helm source parameters. No `base/` required.
+
+### 2. Kustomize (base + overlay)
+Directory: `apps/example-kustomize/`
+Files:
+- `base/` (deployment + service + kustomization)
+- `overlays/production/kustomization.yaml` (references `../../base`)
+- `app.yaml` (metadata: name, path, namespace, wave, enabled)
+Behaviour: ApplicationSet points `source.path` at the overlay; overlay composes base resources.
+
+### app.yaml Fields
+- `name`: ArgoCD Application name and default namespace (unless `namespace` overrides)
+- `type`: `helm` (include repoURL, chart, version) or omit for kustomize
+- `path`: Overlay path (kustomize only) or overlay used for Helm post-render patches
+- `repoURL/chart/version`: Helm chart source (Helm apps)
+- `namespace`: Target namespace
+- `createNamespace`: true/false
+- `wave`: (string/int) optional ordering (add annotation manually until templating finalized)
+- `enabled`: false to skip (future generator logic can filter)
+
+### Migration Steps
+1. For each existing app, add `app.yaml` with the above fields.
+2. Remove its standalone Application manifest after verifying ApplicationSet generated equivalent.
+3. Optionally collapse `base/` if app is pure Helm with no patches.
+
+### Notes
+- Examples are disabled (`enabled: false`) to prevent accidental sync.
+- Templating conditionals in the scaffolded ApplicationSet still need refinement before production use.
 
 ## Application Dependency Flow
 
