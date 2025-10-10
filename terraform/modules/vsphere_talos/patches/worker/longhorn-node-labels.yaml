@@ -1,0 +1,5 @@
+---
+machine:
+  nodeLabels:
+    topology.kubernetes.io/region: eu-west-1
+    topology.kubernetes.io/zone: az1
