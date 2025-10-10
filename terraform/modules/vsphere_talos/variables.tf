@@ -41,7 +41,7 @@ variable "vsphere_worker_vm_memory" {
 variable "vsphere_guest_id" {
   description = "vSphere guest ID for the VMs"
   type        = string
-  default     = "otherGuest64"
+  default     = "other3xLinux64Guest"
 }
 
 variable "vsphere_control_vm_disk_size" {
@@ -100,24 +100,30 @@ variable "talos_arch" {
 }
 
 # Theses two variables are maps that control how many control and worker nodes are created
-# and what their names are. The keys are the talos node names and the values are the vsphere node names
+# and what their names are. The keys are the talos node names and the values are ip addresses
 # to create the VMs on.
 # Example:
 # control_nodes = {
-#   "talos-control-0" = "vsphere-node-0"
+#   "talos-control-0" = { name = "talos-control-0", ip_addr = "172.16.0.10" }
 # }
 # worker_nodes = {
-#   "talos-worker-0" = "vsphere-node-0"
-#   "talos-worker-1" = "vsphere-node-0"
+#   "talos-worker-0" = { name = "talos-worker-1", ip_addr = "172.16.0.11" }
+#   "talos-worker-1" = { name = "talos-worker-2", ip_addr = "172.16.0.12" }
 # }
 variable "control_nodes" {
   description = "Map of talos control node names to vsphere node names"
-  type        = map(string)
+  type = map(object({
+    name : string
+    mac : string
+  }))
 }
 
 variable "worker_nodes" {
   description = "Map of talos worker node names to vsphere node names"
-  type        = map(string)
+  type = map(object({
+    name : string
+    mac : string
+  }))
 }
 
 variable "control_machine_config_patches" {

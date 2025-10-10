@@ -17,7 +17,7 @@ provider "vault" {
 }
 
 provider "talos" {
-  image_factory_url = var.image_factory_url
+  image_factory_url = var.image_factory_ova_url
 }
 
 locals {
@@ -41,23 +41,24 @@ module "talos" {
 
   talos_cluster_name = "cluster2"
   talos_version      = "1.11.2"
-  talos_cluster_endpoint = var.talos_endpoint
+  talos_cluster_endpoint = "api.lab.mxe11.nl"
   control_nodes = {
-    "cp01" = "test-control-1.lab.mxe11.nl"
-    "cp02" = "test-control-2.lab.mxe11.nl"
-    "cp03" = "test-control-3.lab.mxe11.nl"
+    "talos-cp01" = { name = "cp01", mac = "00:50:56:86:d2:c7" }
+    "talos-cp02" = { name = "cp02", mac = "00:50:56:86:55:07" }
+    "talos-cp03" = { name = "cp03", mac = "00:50:56:86:91:3d" }
   }
   control_machine_config_patches = [
 
   ]
   worker_nodes = {
-    "w01" = "test-worker-1.lab.mxe11.nl"
-    "w02" = "test-worker-2.lab.mxe11.nl"
-    "w03" = "test-worker-3.lab.mxe11.nl"
+    "talos-w01" = { name = "w01", mac = "00:50:56:86:25:7c" }
+    "talos-w02" = { name = "w02", mac = "00:50:56:86:61:e1" }
+    "talos-w03" = { name = "w03", mac = "00:50:56:86:f4:d0" }
   }
   worker_machine_config_patches = []
   vsphere = local.vsphere
   talos_image_factory_url = var.image_factory_ova_url
+  talos_schematic_id = var.image_factory_schematic
 }
 
 # module "controlplane" {
@@ -92,9 +93,9 @@ module "talos" {
 #   flavor                  = { cpu = 4, mem_mb = 16384, disk_gb = 40 }
 # }
 
-# resource "talos_machine_secrets" "main" {
-#   talos_version = var.talos_version
-# }
+resource "talos_machine_secrets" "main" {
+  talos_version = var.talos_version
+}
 
 # locals {
 #   cluster_endpoint = "https://${var.vip}:6443"

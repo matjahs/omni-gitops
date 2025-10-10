@@ -1,3 +1,6 @@
+worker.yaml
+controlplane.yaml
+machine_config.yaml
 .vscode/
 .idea/
 .claude/

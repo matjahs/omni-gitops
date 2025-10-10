@@ -23,6 +23,11 @@ variable "image_factory_ova_url" {
   type        = string
 }
 
+variable "image_factory_schematic" {
+  description = "The Talos image factory schematic ID."
+  type        = string
+}
+
 variable "vsphere_user" {
   description = "The username for vSphere API operations."
   type        = string
@@ -152,7 +157,7 @@ variable "virtual_machines" {
 variable "talos_endpoint" {
   description = "The Talos control plane endpoint."
   type        = string
-  default     = "https://172.16.20.250:6443"
+  default     = "172.16.20.250"
   validation {
     // either a valid url (http(s)://...) or IPv4 address
     condition     = can(regex("^(https?://)?((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$", var.talos_endpoint)) || can(regex("^(https?://)?([a-zA-Z0-9.-]+\\.[a-zA-Z]{2,})$", var.talos_endpoint))
