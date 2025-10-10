@@ -6,21 +6,24 @@ machine-config.yaml
 out/
 out-patches/
 config/
-terraform/
+
 *.iso
 *.ova
 
 .DS_Store
 *.log
+crds/
+*.backup
+*.swp
+
+# Terraform
+*.tfplan
 *.tfstate
 *.tfstate.backup
 .terraform/
 .terraform.lock.hcl
 *.tfvars
 *.tfvars.json
-crds/
-*.backup
-*.swp
 
 # Local env files
 .env
@@ -55,3 +58,16 @@ vsan-pvc.yaml
 .gitignore
 tmp/
 bootstrap/talos/my-cluster-exported-template.yaml
+terraform/files/cilium-values.yaml
+terraform/files/coredns-bootstrap.yaml
+terraform/files/install-cilium.yaml
+terraform/files/install-coredns.yaml
+terraform/files/metadata.tftpl
+terraform/files/userdata.tftpl
+terraform/vault-policy.hcl
+.gitignore
+.gitignore
+terraform/machines/controlplane.yaml
+terraform/machines/talosconfig
+terraform/machines/worker.yaml
+terraform/secrets.yaml
