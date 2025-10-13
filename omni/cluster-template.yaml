@@ -59,13 +59,6 @@ patches:
         install:
           disk: /dev/sda
         network:
-          extraHostEntries:
-            - aliases: [node01]
-              ip: 172.16.20.51
-            - aliases: [node02]
-              ip: 172.16.20.52
-            - aliases: [node03]
-              ip: 172.16.20.53
           hostname: node03
           interfaces:
             - addresses: [172.16.20.53/24]

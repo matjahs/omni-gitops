@@ -14,6 +14,15 @@ variable "vsphere" {
   })
 }
 
+variable "kubernetes_version" {
+  type = string
+  default = "1.34.1"
+  validation {
+    condition     = can(regex("^\\d+\\.\\d+\\.\\d+$", var.kubernetes_version))
+    error_message = "kubernetes_version must be in the format 'X.Y.Z'"
+  }
+}
+
 variable "vsphere_control_vm_cores" {
   description = "Number of CPU cores for the control VMs"
   type        = number

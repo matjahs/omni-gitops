@@ -1,13 +1,9 @@
 ---
 cluster:
-  network:
-    cni:
-      name: none
   extraManifests:
     - https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.2.1/standard-install.yaml
     - https://github.com/kubernetes-sigs/gateway-api/raw/refs/heads/main/config/crd/experimental/gateway.networking.k8s.io_tlsroutes.yaml
     - https://raw.githubusercontent.com/cilium/cilium/v1.9/install/kubernetes/quick-install.yaml
-    - https://github.com/longhorn/longhorn/raw/refs/heads/master/deploy/longhorn.yaml
   inlineManifests:
     - name: cilium-l2-crds
       contents: |-

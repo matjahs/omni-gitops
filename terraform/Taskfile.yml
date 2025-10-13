@@ -1,12 +1,10 @@
 ---
-# yaml-language-server: yaml-language-server
-# yaml-language-server: $schema=https://raw.githubusercontent.com/hashicorp/terraform-ls/main
 version: '3'
 tasks:
   default:
+    desc: Format and validate terraform files
     cmds: [terraform fmt -recursive, terraform validate]
     silent: true
-    desc: Format and validate terraform files
   gen-secrets:
-    cmds: [talosctl gen secrets --force > secrets.yaml]
     desc: Generate secrets in vault from secrets.yaml
+    cmds: [talosctl gen secrets --force > secrets.yaml]

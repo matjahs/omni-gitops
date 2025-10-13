@@ -1,0 +1,31 @@
+---
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: '3'
+tasks:
+  apply:
+    internal: true
+    status:
+      - sh: terraform plan -detailed-exitcode || test $? -eq 2
+    desc: Apply Terraform changes
+    cmds: [terraform apply -auto-approve]
+    dir: ./terraform
+  destroy:
+    internal: true
+    desc: Destroy the Terraform-managed infrastructure
+    cmds: [terraform destroy -auto-approve]
+    dir: ./terraform
+  output:
+    internal: true
+    desc: Show the Terraform output values
+    cmds: [terraform output]
+    dir: ./terraform
+  kubeconfig:
+    internal: true
+    desc: Show the Terraform-generated kubeconfig
+    cmds: [terraform output -raw kubeconfig]
+    dir: ./terraform
+  talosconfig:
+    internal: true
+    desc: Show the Terraform-generated talosconfig
+    cmds: [terraform output -raw talos_config]
+    dir: ./terraform

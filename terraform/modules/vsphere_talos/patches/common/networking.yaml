@@ -5,3 +5,14 @@ cluster:
       name: none
   proxy:
     disabled: true
+machine:
+  network:
+    interfaces:
+      - deviceSelector:
+          physical: true
+        dhcp: true
+        routes:
+          - network: 0.0.0.0/0
+            gateway: 172.16.20.1
+        vip:
+          ip: 172.16.20.250
