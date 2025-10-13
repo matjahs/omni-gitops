@@ -23,9 +23,7 @@ spec:
     automated:
       prune: true
       selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
-      - RespectIgnoreDifferences=true
+    syncOptions: [CreateNamespace=true, RespectIgnoreDifferences=true]
     retry:
       limit: 3
       backoff:

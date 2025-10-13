@@ -32,34 +32,7 @@ spec:
         syncOptions:
           - CreateNamespace={{ default "true" .createNamespace }}
       # For pure Helm + overlay, set type: helm in app.yaml
-      sources:
-        - repoURL: '{{ .repoURL }}'
-          chart: '{{ .chart }}'
-          targetRevision: '{{ .version }}'
-          helm:
-            releaseName: '{{ .name }}'
-            {{- if .valueFiles }}
-            valueFiles:
-            {{- range .valueFiles }}
-              - {{ . }}
-            {{- end }}
-            {{- end }}
-
       source:
         repoURL: https://github.com/matjahs/omni-gitops.git
         targetRevision: HEAD
         path: '{{ .path }}'
-      {{- if .ignoreDiff }}
-      ignoreDifferences:
-        {{- range .ignoreDiff }}
-        - group: {{ .group }}
-          kind: {{ .kind }}
-          name: {{ .name }}
-          {{- if .jsonPointers }}
-          jsonPointers:
-            {{- range .jsonPointers }}
-            - {{ . }}
-            {{- end }}
-          {{- end }}
-        {{- end }}
-      {{- end }}

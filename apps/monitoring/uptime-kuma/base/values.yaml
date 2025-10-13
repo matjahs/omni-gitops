@@ -1,10 +1,9 @@
+---
 # Uptime Kuma default values
 # Override these in overlays/production/values.yaml
-
 uptime-kuma:
   # Default configuration
   # Add your specific values here
-
   resources:
     limits:
       cpu: 100m
@@ -12,8 +11,6 @@ uptime-kuma:
     requests:
       cpu: 100m
       memory: 128Mi
-
-
   livenessProbe:
     enabled: true
     failureThreshold: 3
@@ -26,17 +23,10 @@ uptime-kuma:
     # The NodeJS Version of this Healthcheck is no longer supported, therefore we don't specify a node command.
     # https://github.com/louislam/uptime-kuma/blob/ae224f9e188b1fc32ed8729818710975589cdce7/extra/healthcheck.js#L6
     exec:
-      command:
-        - "extra/healthcheck"
-
-
+      command: [extra/healthcheck]
   podSecurityContext: {}
-
   dnsConfig:
-    nameservers:
-      - 172.16.0.53
-      - 172.16.20.10
-      - 172.16.0.1
+    nameservers: [172.16.0.53, 172.16.20.10, 172.16.0.1]
     searches:
       - default.svc.cluster.local
       - svc.cluster.local

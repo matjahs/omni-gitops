@@ -9,7 +9,7 @@ metadata:
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/part-of: platform
   annotations:
-    argocd.argoproj.io/sync-wave: '1' # Deploy after Cilium CNI
+    argocd.argoproj.io/sync-wave: '1'  # Deploy after Cilium CNI
 spec:
   project: default
   source:

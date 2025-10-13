@@ -14,8 +14,13 @@ variable "vsphere" {
   })
 }
 
+variable "ingress_domain" {
+  type    = string
+  default = "apps.lab.mxe11.nl"
+}
+
 variable "kubernetes_version" {
-  type = string
+  type    = string
   default = "1.34.1"
   validation {
     condition     = can(regex("^\\d+\\.\\d+\\.\\d+$", var.kubernetes_version))
@@ -81,7 +86,7 @@ variable "talos_cluster_endpoint" {
   type        = string
 }
 
-variable "talos_schematic_id" {
+variable "image_factory_schematic" {
   # Generate your own at https://factory.talos.dev/
   # The this id has these extensions:
   # qemu-guest-agent (required)
@@ -102,36 +107,30 @@ variable "talos_version" {
   default     = "v1.11.2"
 }
 
-variable "talos_arch" {
-  description = "Architecture of Talos to use"
-  type        = string
-  default     = "amd64"
-}
-
 # Theses two variables are maps that control how many control and worker nodes are created
 # and what their names are. The keys are the talos node names and the values are ip addresses
 # to create the VMs on.
 # Example:
 # control_nodes = {
-#   "talos-control-0" = { name = "talos-control-0", ip_addr = "172.16.0.10" }
+#   "talos-control-0" = { name = "talos-control-0", mac = "", ip_addr = "172.16.0.10" }
 # }
 # worker_nodes = {
-#   "talos-worker-0" = { name = "talos-worker-1", ip_addr = "172.16.0.11" }
-#   "talos-worker-1" = { name = "talos-worker-2", ip_addr = "172.16.0.12" }
+#   "talos-worker-0" = { name = "talos-worker-1", mac = "", ip_addr = "172.16.0.11" }
+#   "talos-worker-1" = { name = "talos-worker-2", mac = "", ip_addr = "172.16.0.12" }
 # }
 variable "control_nodes" {
   description = "Map of talos control node names to vsphere node names"
   type = map(object({
-    name : string
     mac : string
+    ip_addr : string
   }))
 }
 
 variable "worker_nodes" {
   description = "Map of talos worker node names to vsphere node names"
   type = map(object({
-    name : string
     mac : string
+    ip_addr : string
   }))
 }
 
@@ -145,17 +144,4 @@ variable "worker_machine_config_patches" {
   description = "List of YAML patches to apply to the worker machine configuration"
   type        = list(string)
   default     = []
-}
-
-variable "worker_extra_disks" {
-  # This allows for extra disks to be added to the worker VMs
-  # TODO - Should we allow other things like host PCI devices as well E.g., GPUs?
-  description = "Map of talos worker node name to a list of extra disk blocks for the VMs"
-  type = map(list(object({
-    datastore_id = string
-    size         = number
-    file_format  = optional(string)
-    file_id      = optional(string)
-  })))
-  default = {}
 }

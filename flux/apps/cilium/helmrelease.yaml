@@ -34,12 +34,7 @@ spec:
         enabled: true
       metrics:
         enable: true
-        list:
-          - dns
-          - drop
-          - tcp
-          - flow
-          - port-distribution
+        list: [dns, drop, tcp, flow, port-distribution]
     ipam:
       mode: kubernetes
     k8sServiceHost: localhost
@@ -57,8 +52,19 @@ spec:
         enabled: true
     securityContext:
       capabilities:
-        ciliumAgent: ["CHOWN","KILL","NET_ADMIN","NET_RAW","IPC_LOCK","SYS_ADMIN","SYS_RESOURCE","DAC_OVERRIDE","FOWNER","SETGID","SETUID"]
-        cleanCiliumState: ["NET_ADMIN","SYS_ADMIN","SYS_RESOURCE"]
+        ciliumAgent:
+          - CHOWN
+          - KILL
+          - NET_ADMIN
+          - NET_RAW
+          - IPC_LOCK
+          - SYS_ADMIN
+          - SYS_RESOURCE
+          - DAC_OVERRIDE
+          - FOWNER
+          - SETGID
+          - SETUID
+        cleanCiliumState: [NET_ADMIN, SYS_ADMIN, SYS_RESOURCE]
     cgroup:
       autoMount:
         enabled: false

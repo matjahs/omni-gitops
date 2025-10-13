@@ -7,6 +7,14 @@ locals {
     local.worker_node_ips
   )
 
+  worker_nodes = [
+    for vm in keys(var.worker_nodes) : {
+      name : "${vm}"
+    }
+  ]
+
+  endpoint = "api.lab.mxe11.nl"
+
   # load all patch files from the patches directories
   # we sort each fileset to get a consistent list each time
   common_patch_paths       = sort(fileset(path.module, "patches/common/*.yaml"))
@@ -34,13 +42,13 @@ resource "vsphere_virtual_machine" "talos_control_vm" {
   wait_for_guest_net_routable = false
   wait_for_guest_net_timeout  = 0
   wait_for_guest_ip_timeout   = 0
-  enable_disk_uuid = true
-  num_cpus             = var.vsphere_control_vm_cores
-  num_cores_per_socket = var.vsphere_control_vm_cores
-  memory               = var.vsphere_control_vm_memory
+  enable_disk_uuid            = true
+  num_cpus                    = var.vsphere_control_vm_cores
+  num_cores_per_socket        = var.vsphere_control_vm_cores
+  memory                      = var.vsphere_control_vm_memory
 
-  scsi_type                    = "pvscsi"
-  firmware                     = "efi"
+  scsi_type = "pvscsi"
+  firmware  = "efi"
 
   network_interface {
     network_id     = data.vsphere_network.main.id
@@ -113,10 +121,10 @@ resource "vsphere_virtual_machine" "talos_worker_vm" {
   wait_for_guest_net_routable = false
   wait_for_guest_net_timeout  = 0
   wait_for_guest_ip_timeout   = 0
-  enable_disk_uuid = true
-  num_cpus             = var.vsphere_control_vm_cores
-  num_cores_per_socket = var.vsphere_control_vm_cores
-  memory               = var.vsphere_control_vm_memory
+  enable_disk_uuid            = true
+  num_cpus                    = var.vsphere_control_vm_cores
+  num_cores_per_socket        = var.vsphere_control_vm_cores
+  memory                      = var.vsphere_control_vm_memory
 
   scsi_type = "pvscsi"
   firmware  = "efi"
@@ -165,23 +173,25 @@ resource "talos_machine_secrets" "main" {}
 data "talos_machine_configuration" "controlplane" {
   cluster_name     = var.talos_cluster_name
   machine_type     = "controlplane"
-  cluster_endpoint = "https://${var.talos_cluster_endpoint}:6443"
+  cluster_endpoint = "https://${local.endpoint}:6443"
   machine_secrets  = talos_machine_secrets.main.machine_secrets
   config_patches   = local.control_patch_contents
+  examples         = false
 }
 
 data "talos_machine_configuration" "worker" {
   cluster_name     = var.talos_cluster_name
   machine_type     = "worker"
-  cluster_endpoint = "https://${var.talos_cluster_endpoint}:6443"
+  cluster_endpoint = "https://${local.endpoint}:6443"
   machine_secrets  = talos_machine_secrets.main.machine_secrets
   config_patches   = local.worker_patch_contents
+  examples         = false
 }
 
-data "talos_client_configuration" "talos_client_config" {
+data "talos_client_configuration" "main" {
   cluster_name         = var.talos_cluster_name
   client_configuration = talos_machine_secrets.main.client_configuration
-  endpoints            = local.control_node_ips
+  endpoints            = ["https://${local.endpoint}:6443"]
   nodes                = local.node_ips
 }
 
@@ -192,6 +202,7 @@ resource "talos_machine_configuration_apply" "controlplane" {
   machine_configuration_input = data.talos_machine_configuration.controlplane.machine_configuration
   node                        = vsphere_virtual_machine.talos_control_vm[each.key].name
   config_patches              = concat(local.control_patch_contents, var.control_machine_config_patches)
+  endpoint                    = local.endpoint
 }
 
 resource "talos_machine_configuration_apply" "worker" {
@@ -201,16 +212,17 @@ resource "talos_machine_configuration_apply" "worker" {
   machine_configuration_input = data.talos_machine_configuration.worker.machine_configuration
   node                        = vsphere_virtual_machine.talos_worker_vm[each.key].name
   config_patches              = concat(local.worker_patch_contents, var.worker_machine_config_patches)
+  endpoint                    = local.endpoint
 }
 
 resource "talos_machine_bootstrap" "main" {
   depends_on           = [talos_machine_configuration_apply.worker, talos_machine_configuration_apply.controlplane]
-  node                 = local.primary_control_node_ip == null ? "" : local.primary_control_node_ip
+  node                 = "172.16.20.2021"
   client_configuration = talos_machine_secrets.main.client_configuration
 }
 
 resource "talos_cluster_kubeconfig" "main" {
   depends_on           = [talos_machine_bootstrap.main]
   client_configuration = talos_machine_secrets.main.client_configuration
-  node                 = "172.16.20.201"
+  node                 = "${local.endpoint}:6443"
 }

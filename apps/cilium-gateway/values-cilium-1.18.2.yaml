@@ -1,3 +1,4 @@
+---
 # Cilium Helm values snapshot for v1.18.2
 # Source: helm get values cilium (post-upgrade) plus explicit image tag
 # Keep minimal diff; adjust here for future upgrades.
