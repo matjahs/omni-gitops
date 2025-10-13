@@ -41,19 +41,18 @@ module "talos" {
 
   talos_cluster_name = "cluster2"
   talos_version      = "1.11.2"
+  kubernetes_version = var.kubernetes_version
   talos_cluster_endpoint = "api.lab.mxe11.nl"
   control_nodes = {
-    "talos-cp01" = { name = "cp01", mac = "00:50:56:86:d2:c7" }
+    "talos-cp01" = { name = "cp01", mac = "00:50:56:86:D2:C7" }
     "talos-cp02" = { name = "cp02", mac = "00:50:56:86:55:07" }
-    "talos-cp03" = { name = "cp03", mac = "00:50:56:86:91:3d" }
+    "talos-cp03" = { name = "cp03", mac = "00:50:56:86:91:3D" }
   }
-  control_machine_config_patches = [
-
-  ]
+  control_machine_config_patches = []
   worker_nodes = {
-    "talos-w01" = { name = "w01", mac = "00:50:56:86:25:7c" }
-    "talos-w02" = { name = "w02", mac = "00:50:56:86:61:e1" }
-    "talos-w03" = { name = "w03", mac = "00:50:56:86:f4:d0" }
+    "talos-w01" = { name = "w01", mac = "00:50:56:86:25:7C" }
+    "talos-w02" = { name = "w02", mac = "00:50:56:86:61:E1" }
+    "talos-w03" = { name = "w03", mac = "00:50:56:86:F4:D0" }
   }
   worker_machine_config_patches = []
   vsphere = local.vsphere
