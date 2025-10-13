@@ -1,25 +1,28 @@
-
 locals {
-  primary_control_node_ip = vsphere_virtual_machine.talos_control_vm[keys(var.control_nodes)[0]].default_ip_address
-  control_node_ips        = [for vm in keys(var.control_nodes) : vsphere_virtual_machine.talos_control_vm[vm].default_ip_address]
-  worker_node_ips         = [for vm in keys(var.worker_nodes) : vsphere_virtual_machine.talos_worker_vm[vm].default_ip_address]
+  primary_control_node_ip = "172.16.20.201"
+  control_node_ips = [
+    "172.16.20.201", "172.16.20.202", "172.16.20.203"
+  ]
+  worker_node_ips = [
+    "172.16.20.211", "172.16.20.212", "172.16.20.213"
+  ]
   node_ips = concat(
     local.control_node_ips,
     local.worker_node_ips
   )
+
+  # load all patch files from the patches directories
+  # we sort each fileset to get a consistent list each time
   common_patch_paths       = sort(fileset(path.module, "patches/common/*.yaml"))
   controlplane_patch_paths = sort(fileset(path.module, "patches/controlplane/*.yaml"))
   worker_patch_paths       = sort(fileset(path.module, "patches/worker/*.yaml"))
-  default_control_patches = [
-    for patch in concat(local.common_patch_paths, local.controlplane_patch_paths) :
-    file("${path.module}/${patch}")
-  ]
-  default_worker_patches = [
-    for patch in concat(local.common_patch_paths, local.worker_patch_paths) :
-    file("${path.module}/${patch}")
-  ]
+  # Combine common and controlplane patches to ensure all required configurations are applied to controlplane nodes.
+  default_control_patches = sort(concat(local.common_patch_paths, local.controlplane_patch_paths))
+  # Combine common and worker patches so that all worker nodes receive both the shared (common) patches and the worker-specific patches.
+  default_worker_patches = sort(concat(local.common_patch_paths, local.worker_patch_paths))
+  control_patch_contents = [for p in local.default_control_patches : file("${path.module}/${p}")]
+  worker_patch_contents  = [for p in local.default_worker_patches  : file("${path.module}/${p}")]
 }
-
 
 
 resource "vsphere_virtual_machine" "talos_control_vm" {
@@ -35,17 +38,17 @@ resource "vsphere_virtual_machine" "talos_control_vm" {
   num_cpus = var.vsphere_control_vm_cores
   memory   = var.vsphere_control_vm_memory
 
-  scsi_type = "pvscsi"
-
+  scsi_type                    = "pvscsi"
   firmware                     = "efi"
-  # efi_secure_boot_enabled      = true
-  # enable_disk_uuid             = true
+  efi_secure_boot_enabled      = false
+  enable_disk_uuid             = true
   extra_config_reboot_required = true
 
   network_interface {
-    network_id   = data.vsphere_network.main.id
-    adapter_type = "vmxnet3"
-    mac_address = each.value.mac
+    network_id     = data.vsphere_network.main.id
+    adapter_type   = "vmxnet3"
+    mac_address    = lookup(each.value, "mac", null)
+    use_static_mac = true
   }
 
   disk {
@@ -61,7 +64,6 @@ resource "vsphere_virtual_machine" "talos_control_vm" {
     ovf_network_map = {
       "VM Network" = data.vsphere_network.main.id
     }
-
   }
 
   extra_config = {
@@ -74,10 +76,6 @@ resource "vsphere_virtual_machine" "talos_control_vm" {
     create_before_destroy = true
     ignore_changes        = [ovf_deploy]
   }
-
-  wait_for_guest_net_timeout  = 0
-  wait_for_guest_ip_timeout   = 0
-  wait_for_guest_net_routable = false
 }
 
 # resource "null_resource" "vm_reboot" {
@@ -106,23 +104,22 @@ resource "vsphere_virtual_machine" "talos_worker_vm" {
   folder           = var.vsphere.folder
   datacenter_id    = data.vsphere_datacenter.main.id
   host_system_id   = data.vsphere_host.main.id
-  datastore_id     = data.vsphere_datastore.main.id
   resource_pool_id = data.vsphere_compute_cluster.main.resource_pool_id
+  datastore_id     = data.vsphere_datastore.main.id
   guest_id         = var.vsphere_guest_id
 
   num_cpus = var.vsphere_control_vm_cores
   memory   = var.vsphere_control_vm_memory
 
-  scsi_type = "pvscsi"
+  scsi_type                    = "pvscsi"
   firmware                     = "efi"
-  # efi_secure_boot_enabled      = true
 
-  extra_config_reboot_required = true
 
   network_interface {
-    network_id   = data.vsphere_network.main.id
-    adapter_type = "vmxnet3"
-    mac_address = each.value.mac
+    network_id     = data.vsphere_network.main.id
+    adapter_type   = "vmxnet3"
+    mac_address    = lookup(each.value, "mac", null)
+    use_static_mac = true
   }
 
   disk {
@@ -132,8 +129,10 @@ resource "vsphere_virtual_machine" "talos_worker_vm" {
   }
 
   ovf_deploy {
-    remote_ovf_url            = var.talos_image_factory_url
-    disk_provisioning         = "thin"
+    remote_ovf_url       = var.talos_image_factory_url
+    disk_provisioning    = "thin"
+    ip_allocation_policy = "DHCP"
+    ip_protocol          = "IPv4"
     ovf_network_map = {
       "VM Network" = data.vsphere_network.main.id
     }
@@ -149,27 +148,24 @@ resource "vsphere_virtual_machine" "talos_worker_vm" {
     create_before_destroy = true
     ignore_changes        = [ovf_deploy]
   }
-
-  wait_for_guest_net_timeout  = 5
-  wait_for_guest_net_routable = true
 }
 
 resource "talos_machine_secrets" "main" {}
 
 data "talos_machine_configuration" "controlplane" {
-  cluster_name     = var.talos_cluster_name
-  machine_type     = "controlplane"
-  cluster_endpoint = "https://${var.talos_cluster_endpoint}:6443"
-  machine_secrets  = talos_machine_secrets.main.machine_secrets
-  config_patches   = local.default_control_patches
+  cluster_name       = var.talos_cluster_name
+  machine_type       = "controlplane"
+  cluster_endpoint   = "https://${var.talos_cluster_endpoint}:6443"
+  machine_secrets    = talos_machine_secrets.main.machine_secrets
+  config_patches     = local.control_patch_contents
 }
 
 data "talos_machine_configuration" "worker" {
-  cluster_name     = var.talos_cluster_name
-  machine_type     = "worker"
-  cluster_endpoint = "https://${var.talos_cluster_endpoint}:6443"
-  machine_secrets  = talos_machine_secrets.main.machine_secrets
-  config_patches   = local.default_worker_patches
+  cluster_name       = var.talos_cluster_name
+  machine_type       = "worker"
+  cluster_endpoint   = "https://${var.talos_cluster_endpoint}:6443"
+  machine_secrets    = talos_machine_secrets.main.machine_secrets
+  config_patches     = local.worker_patch_contents
 }
 
 data "talos_client_configuration" "talos_client_config" {
@@ -198,11 +194,13 @@ resource "talos_machine_configuration_apply" "worker" {
 }
 
 resource "talos_machine_bootstrap" "main" {
+  depends_on           = [talos_machine_configuration_apply.worker, talos_machine_configuration_apply.controlplane]
   node                 = local.primary_control_node_ip == null ? "" : local.primary_control_node_ip
   client_configuration = talos_machine_secrets.main.client_configuration
 }
 
 resource "talos_cluster_kubeconfig" "main" {
-  client_configuration = talos_machine_secrets.main.client_configuration
-  node                 = local.primary_control_node_ip == null ? "" : local.primary_control_node_ip
+  depends_on = [talos_machine_bootstrap.main]
+  client_configuration         = talos_machine_secrets.main.client_configuration
+  node = "172.16.20.201"
 }
