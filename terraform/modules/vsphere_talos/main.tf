@@ -181,7 +181,7 @@ resource "talos_machine_configuration_apply" "controlplane" {
   client_configuration        = talos_machine_secrets.main.client_configuration
   machine_configuration_input = data.talos_machine_configuration.controlplane.machine_configuration
   node                        = vsphere_virtual_machine.talos_control_vm[each.key].name
-  config_patches              = concat(local.default_control_patches, var.control_machine_config_patches)
+  config_patches              = concat(local.control_patch_contents, var.control_machine_config_patches)
 }
 
 resource "talos_machine_configuration_apply" "worker" {
@@ -190,7 +190,7 @@ resource "talos_machine_configuration_apply" "worker" {
   client_configuration        = talos_machine_secrets.main.client_configuration
   machine_configuration_input = data.talos_machine_configuration.worker.machine_configuration
   node                        = vsphere_virtual_machine.talos_worker_vm[each.key].name
-  config_patches              = concat(local.default_worker_patches, var.worker_machine_config_patches)
+  config_patches              = concat(local.worker_patch_contents, var.worker_machine_config_patches)
 }
 
 resource "talos_machine_bootstrap" "main" {
