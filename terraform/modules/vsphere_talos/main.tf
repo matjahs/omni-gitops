@@ -64,12 +64,10 @@ resource "vsphere_virtual_machine" "talos_control_vm" {
   wait_for_guest_net_routable = false
   wait_for_guest_net_timeout  = 0
   wait_for_guest_ip_timeout   = 0
-
-  # enable_disk_uuid = true
-
-  num_cpus             = var.vsphere_control_vm_cores
-  num_cores_per_socket = var.vsphere_control_vm_cores
-  memory               = var.vsphere_control_vm_memory
+  enable_disk_uuid            = true
+  num_cpus                    = var.vsphere_control_vm_cores
+  num_cores_per_socket        = var.vsphere_control_vm_cores
+  memory                      = var.vsphere_control_vm_memory
 
   scsi_type = "pvscsi"
   firmware  = "efi"
@@ -140,12 +138,11 @@ resource "vsphere_virtual_machine" "talos_worker_vm" {
   wait_for_guest_net_routable = false
   wait_for_guest_net_timeout  = 0
   wait_for_guest_ip_timeout   = 0
-
-  # enable_disk_uuid = true
-
-  num_cpus             = var.vsphere_control_vm_cores
-  num_cores_per_socket = var.vsphere_control_vm_cores
-  memory               = var.vsphere_control_vm_memory
+  
+  enable_disk_uuid            = true
+  num_cpus                    = var.vsphere_control_vm_cores
+  num_cores_per_socket        = var.vsphere_control_vm_cores
+  memory                      = var.vsphere_control_vm_memory
 
   scsi_type = "pvscsi"
   firmware  = "efi"
@@ -212,23 +209,25 @@ resource "talos_machine_secrets" "main" {}
 data "talos_machine_configuration" "controlplane" {
   cluster_name     = var.talos_cluster_name
   machine_type     = "controlplane"
-  cluster_endpoint = "https://${var.talos_cluster_endpoint}:6443"
+  cluster_endpoint = "https://${local.endpoint}:6443"
   machine_secrets  = talos_machine_secrets.main.machine_secrets
   config_patches   = local.control_patch_contents
+  examples         = false
 }
 
 data "talos_machine_configuration" "worker" {
   cluster_name     = var.talos_cluster_name
   machine_type     = "worker"
-  cluster_endpoint = "https://${var.talos_cluster_endpoint}:6443"
+  cluster_endpoint = "https://${local.endpoint}:6443"
   machine_secrets  = talos_machine_secrets.main.machine_secrets
   config_patches   = local.worker_patch_contents
+  examples         = false
 }
 
-data "talos_client_configuration" "talos_client_config" {
+data "talos_client_configuration" "main" {
   cluster_name         = var.talos_cluster_name
   client_configuration = talos_machine_secrets.main.client_configuration
-  endpoints            = local.control_node_ips
+  endpoints            = ["https://${local.endpoint}:6443"]
   nodes                = local.node_ips
 }
 
@@ -261,70 +260,23 @@ resource "talos_machine_configuration_apply" "worker" {
 
   client_configuration        = talos_machine_secrets.main.client_configuration
   machine_configuration_input = data.talos_machine_configuration.worker.machine_configuration
-  config_patches = var.worker_machine_config_patches
-  # See note above for why we reference the collection rather than indexing
-  depends_on = [null_resource.wait_for_talos_worker]
-}
 
-
-// Per-node waiters: poll the Talos RPC port until it becomes reachable.
-resource "null_resource" "wait_for_talos_control" {
-  for_each = local.control_nodes_with_endpoint
-
-  provisioner "local-exec" {
-    command = <<-EOT
-      set -e
-      endpoint=${local.resolved_control_endpoints[each.key]}
-      # strip possible scheme and port - allow 'ip' or 'ip:port'
-      addr=$${endpoint#*://}
-      # default port 50000 if not provided
-      host=$${addr%%:*}
-      port=$${addr##*:}
-      if [ "$${port}" = "$${host}" ]; then port=50000; fi
-      echo "Waiting for Talos RPC at $${host}:$${port}..."
-      for i in $(seq 1 60); do
-        nc -z $${host} $${port} && exit 0 || true
-        sleep 5
-      done
-      echo "Timed out waiting for Talos RPC at $${host}:$${port}" >&2
-      exit 1
-    EOT
-    interpreter = ["/bin/bash", "-c"]
-  }
-}
-
-resource "null_resource" "wait_for_talos_worker" {
-  for_each = local.worker_nodes_with_endpoint
-
-  provisioner "local-exec" {
-    command = <<-EOT
-      set -e
-      endpoint=${local.resolved_worker_endpoints[each.key]}
-      addr=$${endpoint#*://}
-      host=$${addr%%:*}
-      port=$${addr##*:}
-      if [ "$${port}" = "$${host}" ]; then port=50000; fi
-      echo "Waiting for Talos RPC at $${host}:$${port}..."
-      for i in $(seq 1 60); do
-        nc -z $${host} $${port} && exit 0 || true
-        sleep 5
-      done
-      echo "Timed out waiting for Talos RPC at $${host}:$${port}" >&2
-      exit 1
-    EOT
-    interpreter = ["/bin/bash", "-c"]
-  }
+  node                        = vsphere_virtual_machine.talos_worker_vm[each.key].name
+  config_patches              = concat(local.worker_patch_contents, var.worker_machine_config_patches)
+  endpoint                    = local.endpoint
 }
 
 resource "talos_machine_bootstrap" "main" {
   depends_on           = [talos_machine_configuration_apply.worker, talos_machine_configuration_apply.controlplane]
-  node                 = local.primary_control_node_ip == null ? "" : local.primary_control_node_ip
+  node                 = "172.16.20.2021"
   client_configuration = talos_machine_secrets.main.client_configuration
 }
 
 resource "talos_cluster_kubeconfig" "main" {
   depends_on           = [talos_machine_bootstrap.main]
   client_configuration = talos_machine_secrets.main.client_configuration
-  # Use the primary control node IP for kubeconfig retrieval
-  node = local.primary_control_node_ip
+
+  
+  
+  node                 = "${local.endpoint}:6443"
 }

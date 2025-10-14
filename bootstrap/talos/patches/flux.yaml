@@ -77,21 +77,17 @@ cluster:
                     - -c
                     - |
                       set -euo pipefail
-
                       if flux check --components source-controller --namespace="$FLUX_NAMESPACE" >/dev/null 2>&1; then
                         echo "Flux already installed, skipping bootstrap"
                         exit 0
                       fi
-
                       echo "Installing Flux controllers"
                       flux install \
                         --namespace="$FLUX_NAMESPACE" \
                         --components-extra=image-reflector-controller,image-automation-controller \
                         --watch-all-namespaces
-
                       echo "Waiting for Flux CRDs to be established"
                       sleep 15
-
                       echo "Configuring Git repository source"
                       if flux get sources git $FLUX_SOURCE_NAME --namespace="$FLUX_NAMESPACE" >/dev/null 2>&1; then
                         echo "GitRepository $FLUX_SOURCE_NAME already exists"
@@ -102,7 +98,6 @@ cluster:
                           --branch="$FLUX_GIT_BRANCH" \
                           --interval=1m
                       fi
-
                       echo "Creating root kustomization"
                       if flux get kustomization $FLUX_KUSTOMIZATION_NAME --namespace="$FLUX_NAMESPACE" >/dev/null 2>&1; then
                         echo "Kustomization $FLUX_KUSTOMIZATION_NAME already exists"
@@ -116,7 +111,6 @@ cluster:
                           --retry-interval=1m \
                           --timeout=2m
                       fi
-
                       echo "Flux bootstrap complete"
               securityContext:
                 runAsNonRoot: true

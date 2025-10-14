@@ -48,7 +48,7 @@ worker_nodes = {
 
 module "talos" {
   source = "./modules/vsphere_talos"
-
+  
   talos_cluster_name = "cluster1"
   talos_version      = "1.11.2"
   kubernetes_version = var.kubernetes_version

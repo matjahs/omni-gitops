@@ -96,22 +96,6 @@ variable "vm_folder" {
   default     = "Talos"
 }
 
-# variable "vm_user" {
-#   description = "The default user to create in the vm."
-#   type        = string
-# }
-
-# variable "vm_group" {
-#   description = "The default group for the user in the vm."
-#   type        = string
-# }
-
-# variable "vm_timezone" {
-#   description = "The default timezone for the vm."
-#   type        = string
-#   default     = "UTC"
-# }
-
 variable "vm_disk_size" {
   description = "The default disk size for the vm."
   type        = number

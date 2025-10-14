@@ -1,6 +1,6 @@
 output "talos_config" {
   description = "The Talos configuration for the cluster."
-  value       = data.talos_client_configuration.talos_client_config
+  value       = data.talos_client_configuration.main
   sensitive   = true
 }
 
@@ -28,4 +28,17 @@ output "control_node_ips" {
 output "worker_node_ips" {
   description = "The IP addresses of the worker nodes."
   value       = local.worker_node_ips
+}
+
+output "talosconfig" {
+  value     = data.talos_client_configuration.main.talos_config
+  sensitive = true
+}
+
+output "controllers" {
+  value = join(",", [for node in var.control_nodes : node.ip_addr])
+}
+
+output "workers" {
+  value = join(",", [for node in var.worker_nodes : node.ip_addr])
 }

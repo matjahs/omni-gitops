@@ -8,12 +8,6 @@ cluster:
 machine:
   network:
     nameservers: [172.16.0.53]
-    searchDomains: [lab.mxe11.nl, corp.mxe11.nl, mxe11.nl]
+    searchDomains: [lab.mxe11.nl, corp.mxe11.nl
     kubespan:
       enabled: false
-    # interfaces:
-    #   - deviceSelector:
-    #       physical: true
-    #     dhcp: true
-    #     vip:
-    #       ip: api.lab.mxe11.nl
