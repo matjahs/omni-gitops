@@ -244,7 +244,11 @@ resource "talos_machine_configuration_apply" "controlplane" {
   # Ensure we wait until the Talos RPC endpoint is reachable before applying
   # the configuration to avoid race conditions where the VM is not yet
   # listening on port 50000.
-  depends_on = [null_resource.wait_for_talos_control[each.key]]
+  # depends_on must not use dynamic indexing with each.key; reference the
+  # null_resource collection instead so Terraform accepts a static resource
+  # reference. This will wait for all waiters before applying, which is
+  # acceptable for now and avoids invalid HCL expressions.
+  depends_on = [null_resource.wait_for_talos_control]
 }
 
 resource "talos_machine_configuration_apply" "worker" {
@@ -256,7 +260,8 @@ resource "talos_machine_configuration_apply" "worker" {
   client_configuration        = talos_machine_secrets.main.client_configuration
   machine_configuration_input = data.talos_machine_configuration.worker.machine_configuration
   config_patches = var.worker_machine_config_patches
-  depends_on = [null_resource.wait_for_talos_worker[each.key]]
+  # See note above for why we reference the collection rather than indexing
+  depends_on = [null_resource.wait_for_talos_worker]
 }
 
 
