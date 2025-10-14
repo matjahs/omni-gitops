@@ -1,0 +1,10 @@
+---
+# Enable DHCP for talos-cp02 to ensure it gets a gateway and nameservers
+machine:
+  network:
+    interfaces:
+      - deviceSelector:
+          physical: true
+        dhcp: true
+    nameservers: [172.16.0.53, 172.16.0.1]
+    searchDomains: [lab.mxe11.nl, corp.mxe11.nl, mxe11.nl]
