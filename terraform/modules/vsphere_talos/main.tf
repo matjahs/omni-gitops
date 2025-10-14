@@ -238,8 +238,9 @@ resource "talos_machine_configuration_apply" "controlplane" {
 
   client_configuration        = talos_machine_secrets.main.client_configuration
   machine_configuration_input = data.talos_machine_configuration.controlplane.machine_configuration
-
-  config_patches = concat(local.control_patch_contents, var.control_machine_config_patches)
+  # Only include any extra patches passed in via module inputs here. The base
+  # patches are already included in the data.talos_machine_configuration above.
+  config_patches = var.control_machine_config_patches
 }
 
 resource "talos_machine_configuration_apply" "worker" {
@@ -250,8 +251,7 @@ resource "talos_machine_configuration_apply" "worker" {
 
   client_configuration        = talos_machine_secrets.main.client_configuration
   machine_configuration_input = data.talos_machine_configuration.worker.machine_configuration
-
-  config_patches = concat(local.worker_patch_contents, var.worker_machine_config_patches)
+  config_patches = var.worker_machine_config_patches
 }
 
 resource "talos_machine_bootstrap" "main" {
