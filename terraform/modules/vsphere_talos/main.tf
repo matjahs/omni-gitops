@@ -241,6 +241,10 @@ resource "talos_machine_configuration_apply" "controlplane" {
   # Only include any extra patches passed in via module inputs here. The base
   # patches are already included in the data.talos_machine_configuration above.
   config_patches = var.control_machine_config_patches
+  # Ensure we wait until the Talos RPC endpoint is reachable before applying
+  # the configuration to avoid race conditions where the VM is not yet
+  # listening on port 50000.
+  depends_on = [null_resource.wait_for_talos_control[each.key]]
 }
 
 resource "talos_machine_configuration_apply" "worker" {
@@ -252,6 +256,57 @@ resource "talos_machine_configuration_apply" "worker" {
   client_configuration        = talos_machine_secrets.main.client_configuration
   machine_configuration_input = data.talos_machine_configuration.worker.machine_configuration
   config_patches = var.worker_machine_config_patches
+  depends_on = [null_resource.wait_for_talos_worker[each.key]]
+}
+
+
+// Per-node waiters: poll the Talos RPC port until it becomes reachable.
+resource "null_resource" "wait_for_talos_control" {
+  for_each = local.control_nodes_with_endpoint
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      set -e
+      endpoint=$${local.resolved_control_endpoints[each.key]}
+      # strip possible scheme and port - allow 'ip' or 'ip:port'
+      addr=$${endpoint#*://}
+      # default port 50000 if not provided
+      host=$${addr%%:*}
+      port=$${addr##*:}
+      if [ "$${port}" = "$${host}" ]; then port=50000; fi
+      echo "Waiting for Talos RPC at $${host}:$${port}..."
+      for i in $(seq 1 60); do
+        nc -z $${host} $${port} && exit 0 || true
+        sleep 5
+      done
+      echo "Timed out waiting for Talos RPC at $${host}:$${port}" >&2
+      exit 1
+    EOT
+    interpreter = ["/bin/bash", "-c"]
+  }
+}
+
+resource "null_resource" "wait_for_talos_worker" {
+  for_each = local.worker_nodes_with_endpoint
+
+  provisioner "local-exec" {
+    command = <<-EOT
+      set -e
+      endpoint=$${local.resolved_worker_endpoints[each.key]}
+      addr=$${endpoint#*://}
+      host=$${addr%%:*}
+      port=$${addr##*:}
+      if [ "$${port}" = "$${host}" ]; then port=50000; fi
+      echo "Waiting for Talos RPC at $${host}:$${port}..."
+      for i in $(seq 1 60); do
+        nc -z $${host} $${port} && exit 0 || true
+        sleep 5
+      done
+      echo "Timed out waiting for Talos RPC at $${host}:$${port}" >&2
+      exit 1
+    EOT
+    interpreter = ["/bin/bash", "-c"]
+  }
 }
 
 resource "talos_machine_bootstrap" "main" {
