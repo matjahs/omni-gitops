@@ -1,11 +1,41 @@
 locals {
-  primary_control_node_ip = vsphere_virtual_machine.talos_control_vm[keys(var.control_nodes)[0]].default_ip_address
-  control_node_ips        = [for vm in keys(var.control_nodes) : vsphere_virtual_machine.talos_control_vm[vm].default_ip_address]
-  worker_node_ips         = [for vm in keys(var.worker_nodes) : vsphere_virtual_machine.talos_worker_vm[vm].default_ip_address]
+  # Use the static IPs supplied in the control_nodes / worker_nodes maps rather than
+  # relying on the VM guest IP attribute. The latter depends on VMware tools and
+  # the guest reporting its address, which is not available during bootstrap.
+  # Prefer explicit static IPs from the input maps (var.control_nodes / var.worker_nodes).
+  # If those are not present, fallback to the VM-reported guest IP (default_ip_address).
+  primary_control_node_key = keys(var.control_nodes)[0]
+  # Prefer the VM-reported IP (via VMware tools) when available; otherwise use
+  # the static ip_addr from the input map.
+  primary_control_node_ip = coalesce(vsphere_virtual_machine.talos_control_vm[local.primary_control_node_key].default_ip_address, lookup(var.control_nodes[local.primary_control_node_key], "ip_addr", null))
+
+  control_node_ips = [for k in keys(var.control_nodes) : coalesce(vsphere_virtual_machine.talos_control_vm[k].default_ip_address, lookup(var.control_nodes[k], "ip_addr", null))]
+  worker_node_ips  = [for k in keys(var.worker_nodes) : coalesce(vsphere_virtual_machine.talos_worker_vm[k].default_ip_address, lookup(var.worker_nodes[k], "ip_addr", null))]
   node_ips = concat(
     local.control_node_ips,
     local.worker_node_ips
   )
+
+  # Resolved endpoints per node (prefer vm default_ip_address, then ip_addr, then endpoint)
+  resolved_control_endpoints = {
+    for k in keys(var.control_nodes) : k => coalesce(
+      try(vsphere_virtual_machine.talos_control_vm[k].default_ip_address, null),
+      lookup(var.control_nodes[k], "ip_addr", null),
+      lookup(var.control_nodes[k], "endpoint", null)
+    )
+  }
+
+  resolved_worker_endpoints = {
+    for k in keys(var.worker_nodes) : k => coalesce(
+      try(vsphere_virtual_machine.talos_worker_vm[k].default_ip_address, null),
+      lookup(var.worker_nodes[k], "ip_addr", null),
+      lookup(var.worker_nodes[k], "endpoint", null)
+    )
+  }
+
+  # Only include nodes that actually have a resolved endpoint (non-null)
+  control_nodes_with_endpoint = { for k, v in var.control_nodes : k => v if local.resolved_control_endpoints[k] != null }
+  worker_nodes_with_endpoint  = { for k, v in var.worker_nodes  : k => v if local.resolved_worker_endpoints[k]  != null }
 
   # load all patch files from the patches directories
   # we sort each fileset to get a consistent list each time
@@ -34,33 +64,49 @@ resource "vsphere_virtual_machine" "talos_control_vm" {
   wait_for_guest_net_routable = false
   wait_for_guest_net_timeout  = 0
   wait_for_guest_ip_timeout   = 0
-  enable_disk_uuid = true
+
+  # enable_disk_uuid = true
+
   num_cpus             = var.vsphere_control_vm_cores
   num_cores_per_socket = var.vsphere_control_vm_cores
   memory               = var.vsphere_control_vm_memory
 
-  scsi_type                    = "pvscsi"
-  firmware                     = "efi"
+  scsi_type = "pvscsi"
+  firmware  = "efi"
 
   network_interface {
-    network_id     = data.vsphere_network.main.id
-    adapter_type   = "vmxnet3"
-    mac_address    = lookup(each.value, "mac", null)
-    use_static_mac = true
-  }
-
-  disk {
-    label            = "disk0"
-    size             = var.vsphere_control_vm_disk_size
-    thin_provisioned = true
+    network_id   = data.vsphere_network.main.id
+    adapter_type = "vmxnet3"
+    # mac_address    = lookup(each.value, "mac_addr", null)
+    # use_static_mac = true
   }
 
   ovf_deploy {
     remote_ovf_url    = var.talos_image_factory_url
     disk_provisioning = "thin"
+    ip_protocol       = "IPv4"
 
     ovf_network_map = {
       "VM Network" = data.vsphere_network.main.id
+    }
+  }
+
+  disk {
+    label       = "disk0"
+    size        = 12
+    unit_number = 0
+  }
+
+  # Optional extra disk attached to the VM (thin provisioned). Controlled by module variable.
+  dynamic "disk" {
+    for_each = var.extra_disk_enabled ? [1] : []
+    content {
+      label            = "extra-disk-1"
+      size             = var.extra_disk_size_gb
+      controller_type  = "scsi"
+      unit_number      = 1
+      eagerly_scrub    = false
+      thin_provisioned = true
     }
   }
 
@@ -80,26 +126,6 @@ resource "vsphere_virtual_machine" "talos_control_vm" {
   }
 }
 
-# resource "null_resource" "vm_reboot" {
-#   for_each = var.worker_nodes
-
-#   triggers = {
-#     vm_id = vsphere_virtual_machine.main[each.key].id
-#     config_hash = local.[each.key]
-#   }
-
-#   provisioner "local-exec" {
-#     environment = {
-#       GOVC_URL = var.vsphere.server
-#       GOVC_USERNAME = var.vsphere.username
-#       GOVC_PASSWORD = var.vsphere.password
-#       GOVC_INSECURE = "1"
-#     }
-#     command = "govc vm.power -reset ${vsphere_virtual_machine.main[each.key].name}"
-#   }
-# }
-
-
 resource "vsphere_virtual_machine" "talos_worker_vm" {
   for_each         = var.worker_nodes
   name             = each.key
@@ -113,7 +139,9 @@ resource "vsphere_virtual_machine" "talos_worker_vm" {
   wait_for_guest_net_routable = false
   wait_for_guest_net_timeout  = 0
   wait_for_guest_ip_timeout   = 0
-  enable_disk_uuid = true
+
+  # enable_disk_uuid = true
+
   num_cpus             = var.vsphere_control_vm_cores
   num_cores_per_socket = var.vsphere_control_vm_cores
   memory               = var.vsphere_control_vm_memory
@@ -122,25 +150,42 @@ resource "vsphere_virtual_machine" "talos_worker_vm" {
   firmware  = "efi"
 
   network_interface {
-    network_id     = data.vsphere_network.main.id
-    adapter_type   = "vmxnet3"
-    mac_address    = lookup(each.value, "mac", null)
-    use_static_mac = true
-  }
-
-  disk {
-    label            = "disk0"
-    size             = var.vsphere_control_vm_disk_size
-    thin_provisioned = true
+    network_id   = data.vsphere_network.main.id
+    adapter_type = "vmxnet3"
+    # mac_address    = lookup(each.value, "mac_addr", null)
+    # use_static_mac = true
   }
 
   ovf_deploy {
-    remote_ovf_url       = var.talos_image_factory_url
-    disk_provisioning    = "thin"
-    ip_allocation_policy = "DHCP"
-    ip_protocol          = "IPv4"
+    allow_unverified_ssl_cert = true
+    local_ovf_path            = "/Users/matjah/Downloads/vmware-amd64.ova"
+    # Ensure the provider requests thin provisioning and uses IPv4 for OVF
+    # deployment. This avoids reconfiguration attempts that vSphere may
+    # reject for the template disk/device.
+    disk_provisioning = "thin"
+    ip_protocol       = "IPv4"
+
     ovf_network_map = {
       "VM Network" = data.vsphere_network.main.id
+    }
+  }
+
+  disk {
+    label       = "disk0"
+    size        = 12
+    unit_number = 0
+  }
+
+  # Optional extra disk attached to the VM (thin provisioned). Controlled by module variable.
+  dynamic "disk" {
+    for_each = var.extra_disk_enabled ? [1] : []
+    content {
+      label            = "extra-disk-1"
+      size             = var.extra_disk_size_gb
+      controller_type  = "scsi"
+      unit_number      = 1
+      eagerly_scrub    = false
+      thin_provisioned = true
     }
   }
 
@@ -186,21 +231,27 @@ data "talos_client_configuration" "talos_client_config" {
 }
 
 resource "talos_machine_configuration_apply" "controlplane" {
-  for_each = var.control_nodes
+  for_each = local.control_nodes_with_endpoint
+
+  endpoint = local.resolved_control_endpoints[each.key]
+  node     = local.resolved_control_endpoints[each.key]
 
   client_configuration        = talos_machine_secrets.main.client_configuration
   machine_configuration_input = data.talos_machine_configuration.controlplane.machine_configuration
-  node                        = vsphere_virtual_machine.talos_control_vm[each.key].name
-  config_patches              = concat(local.control_patch_contents, var.control_machine_config_patches)
+
+  config_patches = concat(local.control_patch_contents, var.control_machine_config_patches)
 }
 
 resource "talos_machine_configuration_apply" "worker" {
-  for_each = var.worker_nodes
+  for_each = local.worker_nodes_with_endpoint
+
+  endpoint = local.resolved_worker_endpoints[each.key]
+  node     = local.resolved_worker_endpoints[each.key]
 
   client_configuration        = talos_machine_secrets.main.client_configuration
   machine_configuration_input = data.talos_machine_configuration.worker.machine_configuration
-  node                        = vsphere_virtual_machine.talos_worker_vm[each.key].name
-  config_patches              = concat(local.worker_patch_contents, var.worker_machine_config_patches)
+
+  config_patches = concat(local.worker_patch_contents, var.worker_machine_config_patches)
 }
 
 resource "talos_machine_bootstrap" "main" {
@@ -212,5 +263,6 @@ resource "talos_machine_bootstrap" "main" {
 resource "talos_cluster_kubeconfig" "main" {
   depends_on           = [talos_machine_bootstrap.main]
   client_configuration = talos_machine_secrets.main.client_configuration
-  node                 = "172.16.20.201"
+  # Use the primary control node IP for kubeconfig retrieval
+  node = local.primary_control_node_ip
 }

@@ -56,13 +56,13 @@ variable "vsphere_guest_id" {
 variable "vsphere_control_vm_disk_size" {
   description = "vSphere control VM disk size in GB"
   type        = number
-  default     = 32
+  default     = 11193
 }
 
 variable "vsphere_worker_vm_disk_size" {
   description = "vSphere worker VM disk size in GB"
   type        = number
-  default     = 100
+  default     = 11193
 }
 
 variable "vsphere_network" {
@@ -120,18 +120,23 @@ variable "talos_arch" {
 #   "talos-worker-1" = { name = "talos-worker-2", ip_addr = "172.16.0.12" }
 # }
 variable "control_nodes" {
-  description = "Map of talos control node names to vsphere node names"
+  description = "Map of talos control node names to vsphere node names. Each value may include mac_addr, ip_addr (optional), and endpoint (optional)."
   type = map(object({
-    name : string
-    mac : string
+    # Optional static IP intended for provisioning. Use 'endpoint' to explicitly
+    # override the address used by the Talos provider (eg. a reachable IP or
+    # localhost:PORT when using SSH tunnels).
+    ip_addr  = optional(string)
+    mac_addr = string
+    endpoint = optional(string)
   }))
 }
 
 variable "worker_nodes" {
-  description = "Map of talos worker node names to vsphere node names"
+  description = "Map of talos worker node names to vsphere node names. Each value may include mac_addr, ip_addr (optional), and endpoint (optional)."
   type = map(object({
-    name : string
-    mac : string
+    ip_addr  = optional(string)
+    mac_addr = string
+    endpoint = optional(string)
   }))
 }
 
@@ -158,4 +163,21 @@ variable "worker_extra_disks" {
     file_id      = optional(string)
   })))
   default = {}
+}
+
+variable "cluster_node_network" {
+  type = string
+}
+
+# Optional extra disk added to all nodes (thin-provisioned)
+variable "extra_disk_enabled" {
+  description = "Enable adding an extra disk to all VMs"
+  type        = bool
+  default     = true
+}
+
+variable "extra_disk_size_gb" {
+  description = "Size in GB of the extra disk to attach to each VM"
+  type        = number
+  default     = 150
 }

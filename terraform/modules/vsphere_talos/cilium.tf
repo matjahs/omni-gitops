@@ -34,8 +34,8 @@ locals {
       spec = {
         blocks = [
           {
-            start = cidrhost(var.cluster_node_network, var.cluster_node_network_load_balancer_first_hostnum)
-            stop  = cidrhost(var.cluster_node_network, var.cluster_node_network_load_balancer_last_hostnum)
+            start = "172.16.20.250",
+            stop  = "172.16.20.250"
           },
         ]
       }
@@ -58,27 +58,27 @@ data "helm_template" "cilium" {
   repository = "https://helm.cilium.io"
   chart      = "cilium"
   # renovate: datasource=helm depName=cilium registryUrl=https://helm.cilium.io
-  version      = "1.16.0"
+  version      = "1.18.2"
   kube_version = var.kubernetes_version
   api_versions = []
 
   set = [
-    { name = "ipam.mode"                                     value = "kubernetes" },
-    { name = "securityContext.capabilities.ciliumAgent"       value = "{CHOWN,KILL,NET_ADMIN,NET_RAW,IPC_LOCK,SYS_ADMIN,SYS_RESOURCE,DAC_OVERRIDE,FOWNER,SETGID,SETUID}" },
-    { name = "securityContext.capabilities.cleanCiliumState"  value = "{NET_ADMIN,SYS_ADMIN,SYS_RESOURCE}" },
-    { name = "cgroup.autoMount.enabled"                       value = "false" },
-    { name = "cgroup.hostRoot"                                value = "/sys/fs/cgroup" },
-    { name = "k8sServiceHost"                                 value = "localhost" },
-    { name = "k8sServicePort"                                 value = local.common_machine_config.machine.features.kubePrism.port },
-    { name = "kubeProxyReplacement"                           value = "true" },
-    { name = "l2announcements.enabled"                        value = "true" },
-    { name = "devices"                                        value = "{eth0}" },
-    { name = "ingressController.enabled"                      value = "true" },
-    { name = "ingressController.default"                      value = "true" },
-    { name = "ingressController.loadbalancerMode"             value = "shared" },
-    { name = "ingressController.enforceHttps"                 value = "false" },
-    { name = "envoy.enabled"                                  value = "true" },
-    { name = "hubble.relay.enabled"                           value = "true" },
-    { name = "hubble.ui.enabled"                              value = "true" },
+    { name = "ipam.mode"                                     , value = "kubernetes" },
+    { name = "securityContext.capabilities.ciliumAgent"      , value = "{CHOWN,KILL,NET_ADMIN,NET_RAW,IPC_LOCK,SYS_ADMIN,SYS_RESOURCE,DAC_OVERRIDE,FOWNER,SETGID,SETUID}" },
+    { name = "securityContext.capabilities.cleanCiliumState" , value = "{NET_ADMIN,SYS_ADMIN,SYS_RESOURCE}" },
+    { name = "cgroup.autoMount.enabled"                      , value = "false" },
+    { name = "cgroup.hostRoot"                               , value = "/sys/fs/cgroup" },
+    { name = "k8sServiceHost"                                , value = "localhost" },
+    { name = "k8sServicePort"                                , value = "7445" },
+    { name = "kubeProxyReplacement"                          , value = "true" },
+    { name = "l2announcements.enabled"                       , value = "true" },
+    { name = "devices"                                       , value = "{eth0}" },
+    { name = "ingressController.enabled"                     , value = "true" },
+    { name = "ingressController.default"                     , value = "true" },
+    { name = "ingressController.loadbalancerMode"            , value = "shared" },
+    { name = "ingressController.enforceHttps"                , value = "false" },
+    { name = "envoy.enabled"                                 , value = "true" },
+    { name = "hubble.relay.enabled"                          , value = "true" },
+    { name = "hubble.ui.enabled"                             , value = "true" },
   ]
 }

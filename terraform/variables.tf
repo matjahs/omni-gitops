@@ -128,16 +128,16 @@ variable "vm_disk_size" {
 #   type        = string
 # }
 
-variable "virtual_machines" {
-  type = list(object({
-    fqdn        = string,
-    cpu         = number,
-    memory      = number,
-    ip          = string,
-    gateway     = string,
-    nameservers = list(string)
-  }))
-}
+# variable "virtual_machines" {
+#   type = list(object({
+#     fqdn        = string,
+#     cpu         = number,
+#     memory      = number,
+#     ip          = string,
+#     gateway     = string,
+#     nameservers = list(string)
+#   }))
+# }
 
 # variable "addl_disks" {
 #   type = list(object({
@@ -219,4 +219,24 @@ variable "talos_worker_extra_config_patches" {
   description = "Additional configuration patches for worker nodes."
   type        = list(string)
   default     = []
+}
+
+# variable "control_nodes" {
+#   description = "Map of control plane nodes with their MAC and IP addresses."
+#   type = map(object({
+#     mac_addr = string
+#     ip_addr  = string
+#   }))
+# }
+
+# variable "worker_nodes" {
+#   description = "Map of worker nodes with their MAC and IP addresses."
+#     type = map(object({
+#       mac_addr = string
+#       ip_addr  = string
+#   }))
+# }
+
+variable "cluster_node_network" {
+  type = string
 }

@@ -34,30 +34,31 @@ locals {
     lib_name   = var.content_library_name
     ova_item   = var.content_library_item
   }
+  control_nodes = {
+  "talos-cp01" = { mac_addr = "00:50:56:86:D2:C7", ip_addr = "172.16.20.201" } #
+  "talos-cp02" = { mac_addr = "00:50:56:86:55:07", ip_addr = "172.16.20.202" }
+  "talos-cp03" = { mac_addr = "00:50:56:86:91:3D", ip_addr = "172.16.20.203" }
+}
+worker_nodes = {
+  "talos-w01" = { mac_addr = "00:50:56:86:25:7C", ip_addr = "172.16.20.211" }
+  "talos-w02" = { mac_addr = "00:50:56:86:61:E1", ip_addr = "172.16.20.212" } #
+  "talos-w03" = { mac_addr = "00:50:56:86:F4:D0", ip_addr = "172.16.20.213" }
+}
 }
 
 module "talos" {
   source = "./modules/vsphere_talos"
 
-  talos_cluster_name = "cluster2"
+  talos_cluster_name = "cluster1"
   talos_version      = "1.11.2"
   kubernetes_version = var.kubernetes_version
-  talos_cluster_endpoint = "api.lab.mxe11.nl"
-  control_nodes = {
-    "talos-cp01" = { name = "cp01", mac = "00:50:56:86:D2:C7" }
-    "talos-cp02" = { name = "cp02", mac = "00:50:56:86:55:07" }
-    "talos-cp03" = { name = "cp03", mac = "00:50:56:86:91:3D" }
-  }
-  control_machine_config_patches = []
-  worker_nodes = {
-    "talos-w01" = { name = "w01", mac = "00:50:56:86:25:7C" }
-    "talos-w02" = { name = "w02", mac = "00:50:56:86:61:E1" }
-    "talos-w03" = { name = "w03", mac = "00:50:56:86:F4:D0" }
-  }
-  worker_machine_config_patches = []
+  talos_cluster_endpoint = "172.16.20.250"
+  control_nodes = local.control_nodes
+  worker_nodes = local.worker_nodes
   vsphere = local.vsphere
   talos_image_factory_url = var.image_factory_ova_url
   talos_schematic_id = var.image_factory_schematic
+  cluster_node_network = var.cluster_node_network
 }
 
 # module "controlplane" {
