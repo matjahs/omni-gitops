@@ -8,3 +8,9 @@ tasks:
   gen-secrets:
     desc: Generate secrets in vault from secrets.yaml
     cmds: [talosctl gen secrets --force > secrets.yaml]
+  init:
+    desc: Terraform init
+    cmds: [terraform init -upgrade]
+  apply:
+    desc: Terraform apply
+    cmds: [null]

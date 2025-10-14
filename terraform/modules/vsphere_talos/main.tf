@@ -122,6 +122,7 @@ resource "vsphere_virtual_machine" "talos_control_vm" {
       ovf_deploy,
       ept_rvi_mode,
       hv_mode,
+      disk,
     ]
   }
 }
@@ -201,6 +202,7 @@ resource "vsphere_virtual_machine" "talos_worker_vm" {
       ovf_deploy,
       ept_rvi_mode,
       hv_mode,
+      disk,
     ]
   }
 }
@@ -272,7 +274,7 @@ resource "null_resource" "wait_for_talos_control" {
   provisioner "local-exec" {
     command = <<-EOT
       set -e
-      endpoint=$${local.resolved_control_endpoints[each.key]}
+      endpoint=${local.resolved_control_endpoints[each.key]}
       # strip possible scheme and port - allow 'ip' or 'ip:port'
       addr=$${endpoint#*://}
       # default port 50000 if not provided
@@ -297,7 +299,7 @@ resource "null_resource" "wait_for_talos_worker" {
   provisioner "local-exec" {
     command = <<-EOT
       set -e
-      endpoint=$${local.resolved_worker_endpoints[each.key]}
+      endpoint=${local.resolved_worker_endpoints[each.key]}
       addr=$${endpoint#*://}
       host=$${addr%%:*}
       port=$${addr##*:}
