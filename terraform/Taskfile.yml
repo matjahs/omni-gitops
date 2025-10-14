@@ -3,14 +3,14 @@ version: '3'
 tasks:
   default:
     desc: Format and validate terraform files
-    cmds: [terraform fmt -recursive, terraform validate]
+    cmds: ['terraform fmt -recursive, terraform validate']
     silent: true
   gen-secrets:
     desc: Generate secrets in vault from secrets.yaml
     cmds: [talosctl gen secrets --force > secrets.yaml]
-  init:
-    desc: Terraform init
-    cmds: [terraform init -upgrade]
-  apply:
-    desc: Terraform apply
-    cmds: [null]
+  get-kubeconfig:
+    desc: Get kubeconfig from talos control plane
+    cmds: [terraform output -json kubeconfig | yq -r > kubeconfig]
+  get-talosconfig:
+    desc: Get talosconfig from talos control plane
+    cmds: [terraform output -json talosconfig| jq -r > talosconfig]
