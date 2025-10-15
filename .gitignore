@@ -9,6 +9,7 @@ machine-config.yaml
 out/
 out-patches/
 config/
+tfplan
 
 *.iso
 *.ova
@@ -28,6 +29,8 @@ crds/
 .terraform.tfstate.lock.info
 *.tfvars
 *.tfvars.json
+kubeconfig
+talosconfig
 
 # Local env files
 .env
@@ -66,3 +69,4 @@ bootstrap/talos/my-cluster-exported-template.yaml
 /**/workers.yaml
 /**/*.tfvars
 terraform/files/install-cilium.yaml
+/terraform/tfplan

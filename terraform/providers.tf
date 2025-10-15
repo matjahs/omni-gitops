@@ -45,6 +45,10 @@ terraform {
       source  = "hashicorp/random"
       version = "3.6.2"
     }
+    technitium = {
+      source  = "kenske/technitium"
+      version = ">=0.0.6"
+    }
   }
 }
 
@@ -55,4 +59,9 @@ provider "local" {
 provider "github" {
   owner = var.github_owner
   token = var.github_token
+}
+
+provider "technitium" {
+  host  = var.technitium_host
+  token = var.technitium_token
 }

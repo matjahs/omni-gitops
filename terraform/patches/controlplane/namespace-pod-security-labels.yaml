@@ -1,0 +1,32 @@
+---
+cluster:
+  inlineManifests:
+    - name: namespace-pod-security-labels
+      contents: |-
+        ---
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: kube-system
+          labels:
+            pod-security.kubernetes.io/enforce: privileged
+            pod-security.kubernetes.io/audit: privileged
+            pod-security.kubernetes.io/warn: privileged
+        ---
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: kube-public
+          labels:
+            pod-security.kubernetes.io/enforce: baseline
+            pod-security.kubernetes.io/audit: baseline
+            pod-security.kubernetes.io/warn: baseline
+        ---
+        apiVersion: v1
+        kind: Namespace
+        metadata:
+          name: kube-node-lease
+          labels:
+            pod-security.kubernetes.io/enforce: baseline
+            pod-security.kubernetes.io/audit: baseline
+            pod-security.kubernetes.io/warn: baseline
