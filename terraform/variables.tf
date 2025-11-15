@@ -14,17 +14,23 @@ variable "login_username" {
 }
 
 variable "login_password" {
-  description = "The address of the Vault server."
+  description = "The password for Vault authentication."
   type        = string
+}
+
+variable "technitium_host" {
+  description = "The Technitium DNS server host."
+  type        = string
+}
+
+variable "technitium_token" {
+  description = "The Technitium DNS server API token."
+  type        = string
+  sensitive   = true
 }
 
 variable "image_factory_ova_url" {
   description = "The Talos image factory URL."
-  type        = string
-}
-
-variable "image_factory_schematic" {
-  description = "The Talos image factory schematic ID."
   type        = string
 }
 
@@ -112,16 +118,16 @@ variable "vm_disk_size" {
 #   type        = string
 # }
 
-variable "virtual_machines" {
-  type = list(object({
-    fqdn        = string,
-    cpu         = number,
-    memory      = number,
-    ip          = string,
-    gateway     = string,
-    nameservers = list(string)
-  }))
-}
+# variable "virtual_machines" {
+#   type = list(object({
+#     fqdn        = string,
+#     cpu         = number,
+#     memory      = number,
+#     ip          = string,
+#     gateway     = string,
+#     nameservers = list(string)
+#   }))
+# }
 
 # variable "addl_disks" {
 #   type = list(object({
@@ -149,34 +155,6 @@ variable "talos_endpoint" {
   }
 }
 
-variable "talos_version" {
-  description = "The Talos version to deploy."
-  type        = string
-  default     = "v1.11.2"
-  validation {
-    condition     = can(regex("^v\\d+\\.\\d+\\.\\d+$", var.talos_version))
-    error_message = "talos_version must be in the format X.Y.Z, e.g. 1.11.2"
-  }
-}
-
-variable "cp_desired_names" {
-  description = "List of desired control plane node names."
-  type        = list(string)
-  default     = ["cluster1-cp-0", "cluster1-cp-1", "cluster1-cp-2"]
-}
-
-variable "w_desired_names" {
-  description = "List of desired worker node names."
-  type        = list(string)
-  default     = ["cluster1-w-0", "cluster1-w-1"]
-}
-
-variable "cluster_name" {
-  description = "The name of the Talos cluster."
-  type        = string
-  default     = "cluster1"
-}
-
 variable "kubernetes_version" {
   description = "The Kubernetes version to deploy."
   type        = string
@@ -187,20 +165,44 @@ variable "kubernetes_version" {
   }
 }
 
-variable "vip" {
-  description = "The virtual IP address for the control plane endpoint."
+
+variable "cluster_node_network" {
+  description = "172.16.20.0/24"
   type        = string
-  default     = "172.16.20.250"
 }
 
-variable "talos_controlplane_extra_config_patches" {
-  description = "Additional configuration patches for control plane nodes."
+variable "vsphere_control_vm_cores" {
+  description = "Number of CPU cores for the control VMs"
+  type        = number
+  default     = 4
+}
+
+variable "vsphere_control_vm_memory" {
+  description = "Memory in MB for the control VMs"
+  type        = number
+  default     = 4096
+}
+
+variable "vsphere_guest_id" {
+  description = "vSphere guest ID for the VMs"
+  type        = string
+  default     = "other3xLinux64Guest"
+}
+
+variable "talos_cluster_name" {
+  description = "Name of the Talos cluster"
+  type        = string
+  default     = "cluster1"
+}
+
+variable "control_machine_config_patches" {
+  description = "List of YAML patches to apply to the control machine configuration"
   type        = list(string)
   default     = []
 }
 
-variable "talos_worker_extra_config_patches" {
-  description = "Additional configuration patches for worker nodes."
+variable "worker_machine_config_patches" {
+  description = "List of YAML patches to apply to the worker machine configuration"
   type        = list(string)
   default     = []
 }

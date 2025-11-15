@@ -1,0 +1,12 @@
+---
+# Talos VIP configuration for Kubernetes API endpoint
+# This enables the shared virtual IP (172.16.20.250) on all control plane nodes
+# This patch ONLY adds the VIP - static IPs and routes are configured via control_static_ip_patches in main.tf
+# Reference: https://www.talos.dev/v1.11/talos-guides/network/vip/
+machine:
+  network:
+    interfaces:
+      - deviceSelector:
+          physical: true
+        vip:
+          ip: 172.16.20.250

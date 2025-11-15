@@ -1,0 +1,29 @@
+---
+# L2 Announcement Policy for LoadBalancer services
+# This policy enables L2 announcements on worker nodes only
+# Reference: https://doc.crds.dev/github.com/cilium/cilium/cilium.io/CiliumL2AnnouncementPolicy/v2alpha1@1.18.2
+apiVersion: cilium.io/v2alpha1
+kind: CiliumL2AnnouncementPolicy
+metadata:
+  name: external
+  namespace: kube-system
+spec:
+  loadBalancerIPs: true
+  interfaces: [eth0]
+  nodeSelector:
+    matchExpressions:
+      - key: node-role.kubernetes.io/control-plane
+        operator: DoesNotExist
+---
+# LoadBalancer IP Pool for external services
+# This defines the IP range that can be allocated to LoadBalancer services
+# Reference: https://doc.crds.dev/github.com/cilium/cilium/cilium.io/CiliumLoadBalancerIPPool/v2@1.18.2
+apiVersion: cilium.io/v2
+kind: CiliumLoadBalancerIPPool
+metadata:
+  name: external
+  namespace: kube-system
+spec:
+  blocks:
+    - start: 172.16.20.250
+      stop: 172.16.20.250

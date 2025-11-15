@@ -1,0 +1,21 @@
+---
+cluster:
+  network:
+    cni:
+      name: none
+  proxy:
+    disabled: true
+machine:
+  install:
+    disk: /dev/sda
+    wipe: true
+    bootloader: true
+  network:
+    nameservers: [172.16.0.53]
+    searchDomains: [mxe11.nl]
+  kubelet:
+    nodeIP:
+      validSubnets: [172.16.20.0/24]
+    clusterDNS: [172.16.0.53]
+  time:
+    servers: [172.16.0.53]

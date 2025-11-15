@@ -1,0 +1,17 @@
+---
+# Talos cluster node configuration
+# Define control plane and worker nodes with their static IP addresses
+control_nodes:
+  talos-cp01:
+    ip_addr: 172.16.20.201
+  talos-cp02:
+    ip_addr: 172.16.20.202
+  talos-cp03:
+    ip_addr: 172.16.20.203
+worker_nodes:
+  talos-w01:
+    ip_addr: 172.16.20.211
+  talos-w02:
+    ip_addr: 172.16.20.212
+  talos-w03:
+    ip_addr: 172.16.20.213
