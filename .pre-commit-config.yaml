@@ -96,29 +96,25 @@ repos:
         stages: [commit-msg]
         args: []
 
-  # Custom local hooks
-  - repo: local
+  # Terraform docs
+  # - repo: https://github.com/terraform-docs/terraform-docs
+  #   rev: "v0.16.0"
+  #   hooks:
+  #  # Expected directory structure: Place Terraform modules in ./terraform
+  #  # To change the path, update the last argument below.
+  #     - id: terraform-docs-go
+  #       args:
+  #         - "markdown"
+  #         - "table"
+  #         - "--output-file"
+  #         - "README.md"
+  #         - "./terraform"
+
+  # Terraform validation
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.74.1
     hooks:
-      # Validate Kustomize builds
-      - id: kustomize-build
-        name: Validate Kustomize builds
-        entry: scripts/validate-kustomize.sh
-        language: script
-        files: kustomization\.yaml$
-        pass_filenames: false
-
-      # Validate ArgoCD Applications
-      - id: validate-argocd-apps
-        name: Validate ArgoCD Application manifests
-        entry: scripts/validate-argocd-apps.sh
-        language: script
-        files: ^applications/.*\.yaml$
-        pass_filenames: false
-
-      # Check for required namespace in manifests
-      - id: check-namespace
-        name: Check namespace is defined
-        entry: scripts/check-namespace.sh
-        language: script
-        files: ^apps/.*\.yaml$
-        exclude: kustomization\.yaml$
+      - id: terraform_fmt
+      - id: terraform_tflint
+      - id: terraform_validate
+      - id: terraform_tfsec

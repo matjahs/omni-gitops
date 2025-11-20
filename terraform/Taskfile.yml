@@ -1,0 +1,68 @@
+---
+version: '3'
+tasks:
+  default:
+    desc: Format and validate terraform files
+    cmds: [terraform fmt -recursive, terraform validate]
+    silent: true
+  gen-secrets:
+    desc: Generate secrets in vault from secrets.yaml
+    cmds: [talosctl gen secrets --force > secrets.yaml]
+  get-kubeconfig:
+    desc: 'Get kubeconfig from talos control plane. Usage: task get-kubeconfig [TARGET=<path>]'
+    vars:
+      TARGET: '{{.TARGET | default "kubeconfig"}}'
+    cmds:
+      - terraform output -json kubeconfig | jq -r > {{.TARGET}}
+      - echo "Kubeconfig written to {{.TARGET}}"
+  get-talosconfig:
+    desc: 'Get talosconfig from talos control plane. Usage: task get-talosconfig [TARGET=<path>]'
+    vars:
+      TARGET: '{{.TARGET | default "talosconfig"}}'
+    cmds:
+      - terraform output -json talosconfig | jq -r > {{.TARGET}}
+      - echo "Talosconfig written to {{.TARGET}}"
+  merge-kubeconfig:
+    desc: 'Merge kubeconfig into ~/.kube/config (or custom target). Usage: task merge-kubeconfig
+      [TARGET=<path>]'
+    vars:
+      TARGET: '{{.TARGET | default "~/.kube/config"}}'
+    cmds:
+      - terraform output -json kubeconfig | jq -r > /tmp/talos-kubeconfig-temp.yaml
+      - |
+        TARGET_FILE="{{.TARGET}}"
+        # Expand tilde
+        TARGET_FILE="${TARGET_FILE/#\~/$HOME}"
+        if [ -f "$TARGET_FILE" ]; then
+          KUBECONFIG="$TARGET_FILE:/tmp/talos-kubeconfig-temp.yaml" kubectl config view --flatten > /tmp/merged-kubeconfig.yaml
+          mv /tmp/merged-kubeconfig.yaml "$TARGET_FILE"
+        else
+          mkdir -p "$(dirname "$TARGET_FILE")"
+          mv /tmp/talos-kubeconfig-temp.yaml "$TARGET_FILE"
+        fi
+        rm -f /tmp/talos-kubeconfig-temp.yaml
+      - echo "Kubeconfig merged into {{.TARGET}}"
+  merge-talosconfig:
+    desc: 'Merge talosconfig into ~/.talos/config (or custom target). Usage: task
+      merge-talosconfig [TARGET=<path>]'
+    vars:
+      TARGET: '{{.TARGET | default "~/.talos/config"}}'
+    cmds:
+      - terraform output -json talosconfig | jq -r > /tmp/talos-config-temp.yaml
+      - |
+        TARGET_FILE="{{.TARGET}}"
+        # Expand tilde
+        TARGET_FILE="${TARGET_FILE/#\~/$HOME}"
+        DEFAULT_TALOS_CONFIG="$HOME/.talos/config"
+        if [ "$TARGET_FILE" = "$DEFAULT_TALOS_CONFIG" ]; then
+          talosctl config merge /tmp/talos-config-temp.yaml
+        else
+          if [ -f "$TARGET_FILE" ]; then
+            talosctl config merge --talosconfig "$TARGET_FILE" /tmp/talos-config-temp.yaml
+          else
+            mkdir -p "$(dirname "$TARGET_FILE")"
+            mv /tmp/talos-config-temp.yaml "$TARGET_FILE"
+          fi
+        fi
+        rm -f /tmp/talos-config-temp.yaml
+      - echo "Talosconfig merged into {{.TARGET}}"

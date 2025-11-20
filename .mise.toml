@@ -1,7 +1,7 @@
 [env]
 OMNICONFIG = "{{config_root}}/omniconfig"
-KUBECONFIG = "{{config_root}}/kubeconfig"
-TALOSCONFIG = "{{config_root}}/talosconfig"
+KUBECONFIG = "{{config_root}}/terraform/kubeconfig"
+TALOSCONFIG = "{{config_root}}/terraform/talosconfig"
 
 [vars]
 cluster = 'cluster1'

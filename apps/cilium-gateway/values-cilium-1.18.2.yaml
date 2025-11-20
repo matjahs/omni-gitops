@@ -1,0 +1,27 @@
+---
+# Cilium Helm values snapshot for v1.18.2
+# Source: helm get values cilium (post-upgrade) plus explicit image tag
+# Keep minimal diff; adjust here for future upgrades.
+gatewayAPI:
+  enabled: true
+hubble:
+  enabled: true
+  relay:
+    enabled: true
+  ui:
+    enabled: true
+ipam:
+  mode: kubernetes
+k8sServiceHost: localhost
+k8sServicePort: 7445
+l2announcements:
+  enabled: true
+loadBalancer:
+  ipam:
+    mode: cluster-pool
+    operator:
+      clusterPoolIPv4PodCIDRList: 10.244.0.0/16
+  l2announcements:
+    enabled: true
+image:
+  tag: v1.18.2

@@ -14,7 +14,7 @@ We've created **three complementary dashboards** that together provide better vi
 
 ## 1. Gateway Status Dashboard 🎨
 
-**URL**: `https://gateway.apps.lab.mxe11.nl`
+**URL**: `https://gw.apps.lab.mxe11.nl`
 
 A beautiful, real-time dashboard showing all your HTTPRoutes, gateways, and their health status.
 
@@ -58,18 +58,18 @@ A beautiful, real-time dashboard showing all your HTTPRoutes, gateways, and thei
 
 1. **Add DNS entry** (if not using external-dns):
    ```
-   gateway.apps.lab.mxe11.nl → 172.16.20.208
+   gw.apps.lab.mxe11.nl → 172.16.20.208
    ```
 
 2. **Open in browser**:
    ```
-   https://gateway.apps.lab.mxe11.nl
+   https://gw.apps.lab.mxe11.nl
    ```
 
 3. **Or use curl** for testing:
    ```bash
-   curl --resolve gateway.apps.lab.mxe11.nl:443:172.16.20.208 \
-     https://gateway.apps.lab.mxe11.nl -k
+   curl --resolve gw.apps.lab.mxe11.nl:443:172.16.20.208 \
+     https://gw.apps.lab.mxe11.nl -k
    ```
 
 ### Customization
@@ -274,7 +274,7 @@ Hubble provides **request-level observability** that complements the dashboard:
 Once DNS is configured, all dashboards are accessible at:
 
 ```
-🎨 Gateway Status:  https://gateway.apps.lab.mxe11.nl
+🎨 Gateway Status:  https://gw.apps.lab.mxe11.nl
 📊 Grafana:         https://grafana.apps.lab.mxe11.nl/d/cilium-gateway-api
 🌐 Hubble UI:       https://hubble.apps.lab.mxe11.nl
 🚀 ArgoCD:          https://cd.apps.lab.mxe11.nl

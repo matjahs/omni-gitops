@@ -1,0 +1,16 @@
+---
+machine:
+  disks:
+    - device: /dev/sdb
+      partitions:
+        - mountpoint: /var/lib/longhorn
+  kubelet:
+    extraMounts:
+      - destination: /var/lib/longhorn
+        type: bind
+        source: /var/lib/longhorn
+        options: [bind, rshared, rw]
+  kernel:
+    modules:
+      - name: nvme_tcp  # Longhorn Talos docs requirement
+      - name: vfio_pci  # Longhorn Talos docs requirement

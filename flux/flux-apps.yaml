@@ -7,7 +7,9 @@ metadata:
 spec:
   interval: 5m
   prune: true
+  dependsOn:
+    - name: flux-infra
   sourceRef:
     kind: GitRepository
     name: flux-system
-  path: ./flux
+  path: ./flux/apps

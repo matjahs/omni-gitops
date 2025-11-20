@@ -176,7 +176,7 @@ omni-gitops/
 │   │   ├── omni-gitops.yaml
 │   │   └── external-dns.yaml
 │   ├── releases/             # HelmReleases
-│   │   └── external-dns-rfc2136.yaml
+│   │   └── external-dns.yaml
 │   ├── kustomizations/       # Kustomizations
 │   │   ├── monitoring.yaml
 │   │   └── cilium-gateway.yaml

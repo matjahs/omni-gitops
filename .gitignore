@@ -1,3 +1,6 @@
+worker.yaml
+controlplane.yaml
+machine_config.yaml
 .vscode/
 .idea/
 .claude/
@@ -6,19 +9,28 @@ machine-config.yaml
 out/
 out-patches/
 config/
-terraform/
+tfplan
+
+*.iso
+*.ova
 
 .DS_Store
 *.log
+crds/
+*.backup
+*.swp
+
+# Terraform
+*.tfplan
 *.tfstate
 *.tfstate.backup
 .terraform/
 .terraform.lock.hcl
+.terraform.tfstate.lock.info
 *.tfvars
 *.tfvars.json
-crds/
-*.backup
-*.swp
+kubeconfig
+talosconfig
 
 # Local env files
 .env
@@ -31,10 +43,6 @@ crds/
 
 # Thumbnails
 ._*
-splunk/deployment-apps/forwarder_outputs/default/app.conf
-splunk/deployment-apps/forwarder_outputs/default/outputs.conf
-splunk/deployment-apps/forwarder_outputs/metadata/local.meta
-.idea/
 .dockerconfigjson
 
 # Secrets - NEVER commit real secrets!
@@ -44,11 +52,21 @@ splunk/deployment-apps/forwarder_outputs/metadata/local.meta
 .taskfiles/talos/Taskfile.yaml
 .taskfiles/talos/upgrade.yaml
 .taskfiles/tools/precommit.yaml
-Taskfile.yml
+
 .cache/
 .cache_ggshield
 client-info.yaml
 csi-vsphere.conf
 vsan-pvc.yaml
-.gitignore
 tmp/
+bootstrap/talos/my-cluster-exported-template.yaml
+!/terraform/terraform.auto.tfvars
+/terraform/secrets.yaml
+/**/secrets.yaml
+/**/kubeconfig
+/**/talosconfig
+/**/controlplane.yaml
+/**/workers.yaml
+/**/*.tfvars
+terraform/files/install-cilium.yaml
+/terraform/tfplan

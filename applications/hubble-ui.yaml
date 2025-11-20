@@ -4,8 +4,7 @@ kind: Application
 metadata:
   name: hubble-ui
   namespace: argocd
-  finalizers:
-    - resources-finalizer.argocd.argoproj.io
+  finalizers: [resources-finalizer.argocd.argoproj.io]
   labels:
     app.kubernetes.io/managed-by: argocd
     app.kubernetes.io/part-of: platform

@@ -1,0 +1,4 @@
+---
+cluster:
+  extraManifests:
+    - https://github.com/longhorn/longhorn/raw/refs/heads/master/deploy/longhorn.yaml

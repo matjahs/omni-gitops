@@ -1,0 +1,52 @@
+---
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+version: '3'
+includes:
+  talos:
+    taskfile: .taskfiles/talos/Taskfile.yaml
+    internal: false
+tasks:
+  deps:
+    desc: Setup Python venv for scripts (if missing) and install deps
+    cmds:
+      - |
+        if [ ! -d .venv ]; then python3 -m venv .venv; fi
+      - . .venv/bin/activate && pip install --quiet pyyaml
+  validate:apps:
+    desc: Validate app.yaml metadata across apps/
+    deps: [deps]
+    cmds: [. .venv/bin/activate && python scripts/validate_app_metadata.py]
+  kubeconfig:
+    desc: Get kubeconfig for the cluster
+    cmds:
+      - mkdir -p ~/.kube
+      - terraform output -raw kubeconfig > ~/.kube/config-cluster2
+      - chmod 600 ~/.kube/config-cluster2
+    silent: true
+  talosconfig:
+    desc: Get talosconfig for the cluster
+    cmds:
+      - mkdir -p ~/.talos
+      - terraform output -raw talos_config > ~/.talos/config-cluster2
+      - chmod 600 ~/.talos/config-cluster2
+    silent: true
+  talos:setup:
+    desc: Setup Talos on the cluster
+    deps: [talosconfig]
+    cmds: [talosctl --talosconfig ~/.talos/config-cluster2 cluster health]
+  talos:reset:
+    desc: Reset Talos on the cluster
+    deps: [talosconfig]
+    cmds: [talosctl --talosconfig ~/.talos/config-cluster2 reset --force]
+  talos:reboot:
+    desc: Reboot Talos nodes on the cluster
+    deps: [talosconfig]
+    cmds: [talosctl --talosconfig ~/.talos/config-cluster2 reboot]
+  talos:nodes:
+    desc: List Talos nodes on the cluster
+    deps: [talosconfig]
+    cmds:
+      - kubectl get nodes -o json | jq -r '.items[] | .metadata.name + " " + .status.nodeInfo.kubeletVersion'
+      - talosctl --talosconfig ~/.talos/config-cluster2 get nodes
+  talos:version:
+    desc: Get Talos version on the cluster

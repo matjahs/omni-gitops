@@ -22,12 +22,12 @@ The `flux/` directory had a flat structure that mixed different concerns:
 ```
 flux/
 ├── configs/
-│   └── external-dns-rfc2136.yaml
+│   └── external-dns.yaml
 ├── httproutes/
 │   ├── notification-controller-httproute.yaml
 │   └── source-controller-httproute.yaml
 ├── releases/
-│   ├── external-dns-rfc2136.yaml
+│   ├── external-dns.yaml
 │   └── synology-csi.yaml
 ├── resources/
 │   ├── cluster-secret-store.yaml
@@ -190,8 +190,8 @@ flux/
 - `resources/snapshot-crds.yaml` → `infrastructure/snapshot-crds.yaml`
 - `httproutes/*.yaml` → `infrastructure/httproutes/*.yaml`
 - `sources/external-dns.yaml` → `apps/external-dns/helmrepository.yaml`
-- `releases/external-dns-rfc2136.yaml` → `apps/external-dns/helmrelease.yaml`
-- `configs/external-dns-rfc2136.yaml` → `apps/external-dns/config.yaml`
+- `releases/external-dns.yaml` → `apps/external-dns/helmrelease.yaml`
+- `configs/external-dns.yaml` → `apps/external-dns/config.yaml`
 - `resources/synology-csi-namespace.yaml` → `apps/synology-csi/namespace.yaml`
 - `resources/synology-csi-external-secret.yaml` → `apps/synology-csi/externalsecret.yaml`
 - `sources/synology-csi.yaml` → `apps/synology-csi/helmrepository.yaml`

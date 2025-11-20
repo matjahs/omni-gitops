@@ -1,0 +1,51 @@
+#@data/values
+# cluster bits come from cluster_secrets
+machine:
+  type: worker
+  ca:
+    crt: "${cluster_secrets.certs.k8s.crt}"
+    key: "${cluster_secrets.certs.k8s.key}"
+  install:
+    disk: "${install_disk}"
+  network:
+    interfaces:
+      - interface: eth0
+%{ if network_mode == "static" ~}
+        dhcp: false
+        addresses:
+          - "${static_ip}/${static_mask}"
+        routes:
+          - network: 0.0.0.0/0
+            gateway: "${static_gw}"
+%{ else ~}
+        dhcp: true
+%{ endif ~}
+        vip:
+          ip: "${vip}"
+  time:
+    servers: ["pool.ntp.org"]
+
+cluster:
+  id: "${cluster_secrets.cluster.id}" # Globally unique identifier for this cluster (base64 encoded random 32 bytes).
+  secret: "${cluster_secrets.cluster.secret}" # Shared secret of cluster (base64 encoded
+  controlPlane:
+    endpoint: "${cp_endpoint}" # Endpoint is the canonical controlplane endpoint, which can be an IP address or a DNS hostname.
+  clusterName: "${cluster_name}" # Configures the cluster's name.
+  # merge cluster secrets
+  token: "${cluster_secrets.secrets.bootstraptoken}"
+  # secretboxEncryptionSecret: "${cluster_secrets.secrets.secretboxencryptionsecret}"
+  # The base64 encoded root certificate authority used by Kubernetes.
+  ca:
+    crt: "${cluster_secrets.certs.k8s.crt}"
+    key: "${cluster_secrets.certs.k8s.key}"
+  # The base64 encoded aggregator certificate authority used by Kubernetes for front-proxy certificate generation.
+  # aggregatorCA:
+  #     crt: "${cluster_secrets.certs.k8saggregator.crt}"
+  #     key: "${cluster_secrets.certs.k8saggregator.key}"
+  # The base64 encoded private key for service account token generation.
+  # serviceAccount:
+  #     key: "${cluster_secrets.certs.k8sserviceaccount.key}"
+  etcd:
+    ca:
+      crt: "${cluster_secrets.certs.etcd.crt}"
+      key: "${cluster_secrets.certs.etcd.key}"

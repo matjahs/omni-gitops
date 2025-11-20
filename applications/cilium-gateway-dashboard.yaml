@@ -1,0 +1,26 @@
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cilium-gateway-dashboard
+  namespace: argocd
+  finalizers: [resources-finalizer.argocd.argoproj.io]
+  labels:
+    app.kubernetes.io/managed-by: argocd
+    app.kubernetes.io/part-of: platform
+  annotations:
+    argocd.argoproj.io/sync-wave: '1'  # Deploy after Cilium CNI
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/matjahs/omni-gitops.git
+    targetRevision: HEAD
+    path: apps/cilium-gateway/dashboard
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: cilium-gateway-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions: [CreateNamespace=true]

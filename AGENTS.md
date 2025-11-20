@@ -1,37 +1,36 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-- `flux/`: Flux CD-only infrastructure, including cluster CRDs, secrets, and base services (`flux/infrastructure/`) plus infra apps (`flux/apps/`).
-- `apps/`: ArgoCD-only workload manifests organised by app; each app favours `base/` + `overlays/production` Kustomize layout.
-- `applications/`: Declarative ArgoCD `Application` resources implementing the App-of-Apps pattern.
-- `clusters/` & `docs/`: Environment-specific configs and manual references; avoid placing Flux-managed assets here.
-- Binary assets or generated artefacts should stay out of the repo; prefer external registries or secrets managers.
+- `flux/`: Flux CD infrastructure primitives, with `flux/infrastructure/` for cluster services and `flux/apps/` for platform add-ons.
+- `apps/`: ArgoCD workloads organized per app; each keeps a `base/` plus `overlays/production` Kustomize stack.
+- `applications/`: ArgoCD `Application` manifests implementing the App-of-Apps entrypoint.
+- `clusters/` and `docs/`: Environment notes and manuals only; do not place Flux-managed assets here.
+- Keep binaries, generated files, and secrets out of git; rely on registries or secret managers.
 
-## Build, Test, & Development Commands
-- `task deps`: Bootstrap local tooling via Homebrew and install TalHelper.
-- `kubectl kustomize flux/`: Validate Flux renders cleanly before commit.
-- `kubectl kustomize apps/<app>/overlays/production`: Confirm ArgoCD payloads build for production overlays.
-- `flux reconcile kustomization flux-apps --with-source`: Trigger Flux to pull the latest infra changes after merge.
+## Build, Test, and Development Commands
+- `task deps` – install local tooling (Homebrew, TalHelper).
+- `kubectl kustomize flux/` – lint Flux manifests before committing.
+- `kubectl kustomize apps/<app>/overlays/production` – check production payloads, e.g. `kubectl kustomize apps/external-dns/overlays/production`.
+- `flux reconcile kustomization flux-apps --with-source` – pull the latest infra changes after merges.
 
 ## Coding Style & Naming Conventions
-- Apply Prettier formatting (`npx prettier --write` or editor integration) to YAML, JSON, and Markdown prior to committing.
-- Use descriptive Kubernetes resource names; avoid abbreviations (`external-dns-rfc2136`, not `extdns`).
-- Maintain two-space indentation in YAML and keep manifests grouped logically (namespace, source, release, config).
-- Document non-obvious intent with brief comments near complex Kustomize patches only when essential.
+- Use two-space YAML indentation and group resources by namespace, source, release, then config.
+- Prefer descriptive resource names (`external-dns`, not abbreviations).
+- Run `npx prettier --write` (or editor integration) on YAML, JSON, and Markdown prior to commit.
+- Add concise comments only for non-obvious Kustomize patches, especially RBAC changes.
 
 ## Testing Guidelines
-- Dry-run ArgoCD manifests with `kubectl kustomize` before creating or updating an `Application` spec.
-- For Helm-based Flux apps, run `helm template` against referenced charts when adjusting values.
-- Validate secret references using External Secrets tooling in a non-production cluster before rollout.
-- Capture test evidence in the PR "Testing done" section (commands, screenshots, or log excerpts).
+- Dry-run ArgoCD manifests with `kubectl kustomize` before touching `applications/`.
+- Template Helm-driven Flux apps with `helm template` when adjusting values.
+- Validate External Secrets references in a non-production cluster early.
+- Capture evidence (commands, logs, screenshots) in the PR “Testing done” checklist.
 
 ## Commit & Pull Request Guidelines
-- Commits follow `fix: <context>` or `feat: <context>`; squash small tweaks before pushing.
-- PRs include a one-line summary, linked issues (if any), and the "Testing done" checklist.
-- Verify linting and Kustomize outputs locally; note any deviations or follow-up tasks in the PR body.
-- Respect Flux/Argo boundaries: infra lives under `flux/`, application workloads under `apps/` + `applications/`.
+- Commits follow `feat: <context>` or `fix: <context>`; squash cleanups before pushing.
+- PRs include a one-line summary, linked issues, and completed testing notes.
+- Confirm linting and kustomize outputs locally; document follow-ups in the PR body.
+- Keep Flux and Argo roles separate—Flux owns infrastructure, Argo owns workloads; maintain ignore rules when adding directories.
 
 ## Hybrid GitOps Responsibilities
-- Flux bootstraps ArgoCD and cluster primitives; do not point ArgoCD sources at `flux/`.
-- ArgoCD owns workloads; ensure Flux ignores remain intact when adding new directories.
-- When unsure which tool should manage a resource, raise the question before opening a PR to avoid reconciliation loops.
+- Flux bootstraps ArgoCD and cluster primitives; never point ArgoCD at `flux/`.
+- Raise questions when ownership feels ambiguous to avoid reconciliation loops.
