@@ -25,6 +25,10 @@ machineClass:
   name: cluster1-controlplane
   size: 3
 patches:
+  - name: cilium
+    file: patches/cilium.yaml
+  - name: flux
+    file: patches/flux.yaml
   - name: monitoring
     file: patches/monitoring.yaml
 ---
